@@ -1,0 +1,15 @@
+/vendor/
+/node_modules/
+/uploads/
+/data/
+/config/cfg/
+/install/install.lock
+/.env
+.DS_Store
+*.log
+*.swp
+*.swo
+*.bak
+/__pycache__/
+/.idea/
+/.vscode/
