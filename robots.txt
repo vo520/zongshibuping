@@ -8,3 +8,5 @@ Disallow:/config
 Disallow:/extend
 Disallow: /vendor
 Disallow: /*?*
+
+Sitemap: https://zongshibuping.shop/sitemap.xml
