@@ -1,1 +1,11 @@
-deny from all
+<Files "test-api.html">
+    Allow from all
+</Files>
+
+<Files "*.php">
+    Deny from all
+</Files>
+
+<FilesMatch "^(?!test-api\.html$).*\.(html?|css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+    Allow from all
+</FilesMatch>
