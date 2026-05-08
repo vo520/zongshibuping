@@ -1,0 +1,1329 @@
+{
+  "info": {
+    "name": "FoxCMS API v1.0",
+    "description": "FoxCMS API 接口集合，包含栏目、文章、产品、图片、视频、下载、统计等完整接口",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "foxcms-api-v1",
+    "_exporter_id": "foxcms-team"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://www.foxcms.text",
+      "type": "string"
+    },
+    {
+      "key": "apiPath",
+      "value": "/api",
+      "type": "string"
+    },
+    {
+      "key": "lang",
+      "value": "zh",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-App-Id",
+        "in": "header"
+      },
+      {
+        "key": "value",
+        "value": "app_001",
+        "in": "header"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "栏目 API",
+      "item": [
+        {
+          "name": "获取栏目列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/column/list?lang={{lang}}&pid=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "column", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "pid",
+                  "value": "0",
+                  "description": "父级栏目ID，-1表示全部，0表示顶级"
+                }
+              ]
+            },
+            "description": "获取栏目列表，支持语言和父级栏目筛选"
+          },
+          "response": []
+        },
+        {
+          "name": "获取栏目详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/column/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "column", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "栏目ID"
+                }
+              ]
+            },
+            "description": "获取栏目详细信息"
+          },
+          "response": []
+        },
+        {
+          "name": "获取栏目树形结构",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/column/tree?lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "column", "tree"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ]
+            },
+            "description": "获取栏目树形结构，用于前端导航"
+          },
+          "response": []
+        },
+        {
+          "name": "获取面包屑导航",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/column/breadcrumb?id=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "column", "breadcrumb"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "5",
+                  "description": "栏目ID"
+                }
+              ]
+            },
+            "description": "获取栏目的面包屑导航路径"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "文章 API",
+      "item": [
+        {
+          "name": "获取文章列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/list?lang={{lang}}&page=1&pageSize=10&columnId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "每页数量，默认15，最大100"
+                },
+                {
+                  "key": "columnId",
+                  "value": "1",
+                  "description": "栏目ID，支持子栏目"
+                },
+                {
+                  "key": "tag",
+                  "value": "",
+                  "description": "标签筛选"
+                },
+                {
+                  "key": "recommend",
+                  "value": "",
+                  "description": "推荐筛选，传入1"
+                }
+              ]
+            },
+            "description": "获取文章列表，支持分页、语言、栏目、标签、推荐筛选"
+          },
+          "response": []
+        },
+        {
+          "name": "获取文章详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "文章ID"
+                }
+              ]
+            },
+            "description": "获取文章详细信息，自动增加阅读数"
+          },
+          "response": []
+        },
+        {
+          "name": "获取推荐文章",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/recommend?lang={{lang}}&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "recommend"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "columnId",
+                  "value": "",
+                  "description": "栏目ID"
+                },
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": "返回数量，默认5，最大20"
+                }
+              ]
+            },
+            "description": "获取推荐文章列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取热门文章",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/hot?lang={{lang}}&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "hot"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "columnId",
+                  "value": "",
+                  "description": "栏目ID"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "返回数量，默认10，最大20"
+                }
+              ]
+            },
+            "description": "获取热门文章列表，按点击量排序"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "产品 API",
+      "item": [
+        {
+          "name": "获取产品列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/product/list?lang={{lang}}&page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "product", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "每页数量"
+                },
+                {
+                  "key": "columnId",
+                  "value": "",
+                  "description": "栏目ID"
+                },
+                {
+                  "key": "recommend",
+                  "value": "",
+                  "description": "推荐筛选"
+                }
+              ]
+            },
+            "description": "获取产品列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取产品详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/product/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "product", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "产品ID"
+                }
+              ]
+            },
+            "description": "获取产品详细信息"
+          },
+          "response": []
+        },
+        {
+          "name": "获取推荐产品",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/product/recommend?lang={{lang}}&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "product", "recommend"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": "返回数量"
+                }
+              ]
+            },
+            "description": "获取推荐产品列表"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "图片 API",
+      "item": [
+        {
+          "name": "获取图片列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/images/list?lang={{lang}}&page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "images", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "15",
+                  "description": "每页数量"
+                },
+                {
+                  "key": "columnId",
+                  "value": "",
+                  "description": "栏目ID"
+                }
+              ]
+            },
+            "description": "获取图片列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取图片详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/images/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "images", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "图片ID"
+                }
+              ]
+            },
+            "description": "获取图片详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "视频 API",
+      "item": [
+        {
+          "name": "获取视频列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/video/list?lang={{lang}}&page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "video", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "columnId",
+                  "value": "",
+                  "description": "栏目ID"
+                }
+              ]
+            },
+            "description": "获取视频列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取视频详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/video/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "video", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "视频ID"
+                }
+              ]
+            },
+            "description": "获取视频详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "下载 API",
+      "item": [
+        {
+          "name": "获取下载列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/download/list?lang={{lang}}&page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "download", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "columnId",
+                  "value": "",
+                  "description": "栏目ID"
+                }
+              ]
+            },
+            "description": "获取下载资源列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取下载详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/download/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "download", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "下载ID"
+                }
+              ]
+            },
+            "description": "获取下载资源详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "其他内容 API",
+      "item": [
+        {
+          "name": "获取单页内容",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/other/single?columnId=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "other", "single"],
+              "query": [
+                {
+                  "key": "columnId",
+                  "value": "10",
+                  "description": "栏目ID（单页类型）"
+                }
+              ]
+            },
+            "description": "获取单页内容"
+          },
+          "response": []
+        },
+        {
+          "name": "获取幻灯片",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/other/slides?group=default&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "other", "slides"],
+              "query": [
+                {
+                  "key": "group",
+                  "value": "default",
+                  "description": "幻灯片分组"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "返回数量"
+                }
+              ]
+            },
+            "description": "获取幻灯片列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取友情链接",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/other/links?type=all&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "other", "links"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "all",
+                  "description": "类型：all/logo/text"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "返回数量"
+                }
+              ]
+            },
+            "description": "获取友情链接"
+          },
+          "response": []
+        },
+        {
+          "name": "获取标签列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/other/tags?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "other", "tags"],
+              "query": [
+                {
+                  "key": "group",
+                  "value": "",
+                  "description": "标签分组"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "返回数量"
+                }
+              ]
+            },
+            "description": "获取标签列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取导航菜单",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/other/nav?position=header&lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "other", "nav"],
+              "query": [
+                {
+                  "key": "position",
+                  "value": "header",
+                  "description": "位置：header/footer"
+                },
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ]
+            },
+            "description": "获取导航菜单"
+          },
+          "response": []
+        },
+        {
+          "name": "获取系统配置",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/other/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "other", "config"],
+              "description": "获取系统配置，不传key返回全部"
+            },
+            "description": "获取系统配置"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "标签内容 API",
+      "item": [
+        {
+          "name": "获取标签下的文章",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/tag/article?tag=PHP&lang={{lang}}&page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "tag", "article"],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "PHP",
+                  "description": "标签名称"
+                },
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                }
+              ]
+            },
+            "description": "获取指定标签下的文章列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取标签下的产品",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/tag/product?tag=新品&lang={{lang}}&page=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "tag", "product"],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "新品",
+                  "description": "标签名称"
+                },
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ]
+            },
+            "description": "获取指定标签下的产品列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取热门标签",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/tag/hot?limit=20&lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "tag", "hot"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "返回数量"
+                },
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ]
+            },
+            "description": "获取热门标签列表"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "统计 API",
+      "item": [
+        {
+          "name": "获取统计概览",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/stats/overview?lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "stats", "overview"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ],
+              "description": "获取各类型内容的数量统计"
+            },
+            "response": []
+          },
+          {
+            "name": "获取热门内容",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}{{apiPath}}/stats/popular?type=article&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["{{apiPath}}", "stats", "popular"],
+                "query": [
+                  {
+                    "key": "type",
+                    "value": "article",
+                    "description": "内容类型：article/product/images/video/download"
+                  },
+                  {
+                    "key": "lang",
+                    "value": "{{lang}}",
+                    "description": "语言标识"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10",
+                    "description": "返回数量"
+                  }
+                ]
+              },
+              "description": "获取热门内容排行"
+            },
+            "response": []
+          },
+        {
+          "name": "获取访问统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/stats/visits?lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "stats", "visits"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ],
+              "description": "获取访问统计信息"
+            },
+            "response": []
+          },
+        {
+          "name": "获取栏目统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/stats/columns?lang={{lang}}&pid=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "stats", "columns"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "pid",
+                  "value": "0",
+                  "description": "父级栏目ID"
+                }
+              ],
+              "description": "获取栏目的内容统计"
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "反馈 API",
+      "item": [
+        {
+          "name": "获取反馈列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/feedback/list?lang={{lang}}&page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "feedback", "list"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "处理状态：pending/processing/resolved"
+                }
+              ]
+            },
+            "description": "获取反馈列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取反馈详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/feedback/detail?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "feedback", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "反馈ID"
+                }
+              ]
+            },
+            "description": "获取反馈详细信息"
+          },
+          "response": []
+        },
+        {
+          "name": "获取反馈统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/feedback/statistics?lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "feedback", "statistics"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                }
+              ],
+              "description": "获取反馈统计信息"
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "搜索 API",
+      "item": [
+        {
+          "name": "全局搜索",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/search?keyword=test&type=all&lang={{lang}}&page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "test",
+                  "description": "搜索关键词"
+                },
+                {
+                  "key": "type",
+                  "value": "all",
+                  "description": "搜索类型：all/article/product/images/video/download"
+                },
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "语言标识"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                }
+              ]
+            },
+            "description": "全局搜索，支持多类型同时搜索"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "测试用例",
+      "item": [
+        {
+          "name": "参数验证 - 无效ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('响应成功', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('返回错误码1001', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.not.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/detail?id=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "0",
+                  "description": "无效ID"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "资源不存在",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('响应成功', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('返回404错误码', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(1005);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/detail?id=999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "detail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "999999",
+                  "description": "不存在的ID"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "分页边界测试",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('响应成功', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(1);",
+                  "});",
+                  "pm.test('返回分页信息', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('pagination');",
+                  "});",
+                  "pm.test('分页信息完整', function() {",
+                  "    var pagination = pm.response.json().data.pagination;",
+                  "    pm.expect(pagination).to.have.property('page');",
+                  "    pm.expect(pagination).to.have.property('pageSize');",
+                  "    pm.expect(pagination).to.have.property('total');",
+                  "    pm.expect(pagination).to.have.property('totalPages');",
+                  "    pm.expect(pagination).to.have.property('hasMore');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/list?page=1&pageSize=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "list"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "首页"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "15",
+                  "description": "标准分页"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "CORS 预检请求",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://example.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "GET"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "Content-Type"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPath}}/article/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{apiPath}}", "article", "list"]
+            },
+            "description": "测试CORS预检请求"
+          }
+        }
+      ]
+    }
+  ]
+}

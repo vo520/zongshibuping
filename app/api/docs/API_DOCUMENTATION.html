@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoxCMS API 接入文档</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --danger-color: #f44336;
+            --warning-color: #FF9800;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #2E7D32);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header-meta span {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+
+        /* 侧边导航 */
+        .sidebar {
+            position: sticky;
+            top: 30px;
+            height: fit-content;
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .sidebar h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar a {
+            color: var(--text-color);
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card h3 {
+            color: var(--secondary-color);
+            margin: 20px 0 15px;
+        }
+
+        /* 代码块样式 */
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #d63384;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* 标签样式 */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-get { background: #61affe; color: white; }
+        .badge-post { background: #49cc90; color: white; }
+        .badge-required { background: var(--danger-color); color: white; }
+        .badge-optional { background: var(--secondary-color); color: white; }
+
+        /* 响应示例 */
+        .response-block {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .response-block h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        /* 警告框 */
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .danger-box {
+            background: #f8d7da;
+            border-left: 4px solid var(--danger-color);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 快速导航 */
+        .quick-nav {
+            background: linear-gradient(135deg, var(--secondary-color), #1976D2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-nav h3 {
+            margin-bottom: 15px;
+        }
+
+        .quick-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-nav-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s;
+        }
+
+        .quick-nav-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* 搜索框 */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* 交互式测试区 */
+        .api-tester {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            color: #d4d4d4;
+        }
+
+        .api-tester h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .tester-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tester-form select, .tester-form input {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #2d2d2d;
+            color: white;
+        }
+
+        .tester-form button {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .tester-form button:hover {
+            background: #388E3C;
+        }
+
+        .tester-result {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* 响应状态指示 */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot.success { background: var(--primary-color); }
+        .status-dot.error { background: var(--danger-color); }
+        .status-dot.warning { background: var(--warning-color); }
+
+        /* 滚动导航 */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        /* 复制按钮 */
+        .copy-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* 折叠面板 */
+        .collapsible {
+            background: #f5f5f5;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .collapsible-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .collapsible-header:hover {
+            background: #f0f0f0;
+        }
+
+        .collapsible-content {
+            padding: 15px 20px;
+            display: none;
+        }
+
+        .collapsible.active .collapsible-content {
+            display: block;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        /* 滚动回到顶部 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="header">
+        <div class="header-content">
+            <h1>📚 FoxCMS API 接入文档</h1>
+            <p>版本 v1.0.0 | 包含 40+ 个 API 接口</p>
+            <div class="header-meta">
+                <span>✅ RESTful 规范</span>
+                <span>🔒 签名认证</span>
+                <span>⚡ 限流保护</span>
+                <span>🌐 CORS 支持</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 侧边导航 -->
+        <aside class="sidebar">
+            <h3>📑 目录</h3>
+            <ul>
+                <li><a href="#quick-start">快速开始</a></li>
+                <li><a href="#base-info">基础信息</a></li>
+                <li><a href="#auth">认证方式</a></li>
+                <li><a href="#column">栏目 API</a></li>
+                <li><a href="#article">文章 API</a></li>
+                <li><a href="#product">产品 API</a></li>
+                <li><a href="#content">内容 API</a></li>
+                <li><a href="#other">其他 API</a></li>
+                <li><a href="#tag">标签 API</a></li>
+                <li><a href="#stats">统计 API</a></li>
+                <li><a href="#error-codes">错误码</a></li>
+                <li><a href="#sdk">SDK 使用</a></li>
+                <li><a href="#faq">常见问题</a></li>
+                <li><a href="#security">安全注意</a></li>
+            </ul>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 快速导航 -->
+            <div class="quick-nav">
+                <h3>🚀 快速导航</h3>
+                <div class="quick-nav-grid">
+                    <a href="#column" class="quick-nav-item">📁 栏目</a>
+                    <a href="#article" class="quick-nav-item">📝 文章</a>
+                    <a href="#product" class="quick-nav-item">📦 产品</a>
+                    <a href="#search" class="quick-nav-item">🔍 搜索</a>
+                    <a href="#tag" class="quick-nav-item">🏷️ 标签</a>
+                    <a href="#stats" class="quick-nav-item">📊 统计</a>
+                </div>
+            </div>
+
+            <!-- 搜索框 -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索 API 接口... (按 / 键聚焦)">
+            </div>
+
+            <!-- 快速开始 -->
+            <section id="quick-start" class="card">
+                <h2>🚀 快速开始</h2>
+                
+                <h3>安装依赖</h3>
+                <pre><code>npm install axios</code></pre>
+
+                <h3>快速示例</h3>
+                <pre><code>import axios from 'axios';
+
+// 创建 API 客户端
+const api = axios.create({
+  baseURL: 'https://api.your-domain.com',
+  timeout: 10000,
+});
+
+// 获取文章列表
+async function getArticles() {
+  const response = await api.get('/article/list', {
+    params: { lang: 'zh', page: 1, pageSize: 10 }
+  });
+  console.log(response.data);
+}</code></pre>
+
+                <div class="warning-box">
+                    <strong>💡 提示:</strong> 所有公开接口均支持 CORS，可直接从前端调用，无需配置代理。
+                </div>
+            </section>
+
+            <!-- 基础信息 -->
+            <section id="base-info" class="card">
+                <h2>📌 基础信息</h2>
+                
+                <table>
+                    <tr>
+                        <th>环境</th>
+                        <th>地址</th>
+                        <th>说明</th>
+                    </tr>
+                    <tr>
+                        <td>生产环境</td>
+                        <td><code>https://api.your-domain.com</code></td>
+                        <td>正式服务</td>
+                    </tr>
+                    <tr>
+                        <td>测试环境</td>
+                        <td><code>https://test-api.your-domain.com</code></td>
+                        <td>测试服务</td>
+                    </tr>
+                </table>
+
+                <h3>数据格式</h3>
+                <ul>
+                    <li><strong>请求格式:</strong> <code>application/x-www-form-urlencoded</code> 或 <code>application/json</code></li>
+                    <li><strong>响应格式:</strong> <code>application/json</code></li>
+                </ul>
+
+                <h3>响应结构</h3>
+                <div class="response-block">
+                    <h4>成功响应</h4>
+                    <pre><code>{
+  "code": 1,
+  "msg": "success",
+  "data": { ... },
+  "time": 1704067200,
+  "requestId": "req_abc123"
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- 认证方式 -->
+            <section id="auth" class="card">
+                <h2>🔐 认证方式</h2>
+                
+                <h3>公开接口（无需认证）</h3>
+                <p>以下接口无需任何认证即可访问：</p>
+                <div class="response-block">
+                    <pre><code>/api/column/list, /api/column/tree
+/api/article/list, /api/article/recommend, /api/article/hot
+/api/product/list, /api/product/recommend
+/api/other/* (slides, links, tags, nav, config)
+/api/search</code></pre>
+                </div>
+
+                <h3>签名认证（可选）</h3>
+                <p>对于需要认证的接口，请在请求头中添加以下参数：</p>
+                
+                <table>
+                    <tr>
+                        <th>参数</th>
+                        <th>说明</th>
+                        <th>示例</th>
+                    </tr>
+                    <tr>
+                        <td><code>X-App-Id</code></td>
+                        <td>应用 ID</td>
+                        <td><code>app_001</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>X-Timestamp</code></td>
+                        <td>时间戳（秒）</td>
+                        <td><code>1704067200</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>X-Signature</code></td>
+                        <td>签名</td>
+                        <td><code>a1b2c3d4e5f6...</code></td>
+                    </tr>
+                </table>
+
+                <div class="danger-box">
+                    <strong>⚠️ 注意:</strong> 签名算法需要联系管理员获取 App Secret，请勿在前端暴露密钥。
+                </div>
+            </section>
+
+            <!-- 栏目 API -->
+            <section id="column" class="card">
+                <h2>📁 栏目 API</h2>
+
+                <div class="collapsible active">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/column/list</strong> - 获取栏目列表</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <h4>请求参数</h4>
+                        <table>
+                            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+                            <tr><td>lang</td><td>string</td><td class="badge badge-optional">否</td><td>语言标识</td></tr>
+                            <tr><td>pid</td><td>int</td><td class="badge badge-optional">否</td><td>父级栏目 ID</td></tr>
+                        </table>
+                        <h4>响应示例</h4>
+                        <pre><code>{
+  "code": 1,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "pid": 0,
+      "name": "新闻",
+      "model": "article",
+      "urlname": "news",
+      "picUrl": "/uploads/column.jpg"
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/column/detail</strong> - 获取栏目详情</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <h4>请求参数</h4>
+                        <table>
+                            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+                            <tr><td>id</td><td>int</td><td class="badge badge-required">是</td><td>栏目 ID</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/column/tree</strong> - 获取栏目树</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content"></div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/column/breadcrumb</strong> - 获取面包屑</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content"></div>
+                </div>
+            </section>
+
+            <!-- 文章 API -->
+            <section id="article" class="card">
+                <h2>📝 文章 API</h2>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/article/list</strong> - 获取文章列表</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <h4>请求参数</h4>
+                        <table>
+                            <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+                            <tr><td>page</td><td>int</td><td class="badge badge-optional">否</td><td>页码，默认 1</td></tr>
+                            <tr><td>pageSize</td><td>int</td><td class="badge badge-optional">否</td><td>每页数量，默认 15，最大 100</td></tr>
+                            <tr><td>lang</td><td>string</td><td class="badge badge-optional">否</td><td>语言标识</td></tr>
+                            <tr><td>columnId</td><td>int</td><td class="badge badge-optional">否</td><td>栏目 ID，支持子栏目</td></tr>
+                            <tr><td>tag</td><td>string</td><td class="badge badge-optional">否</td><td>标签筛选</td></tr>
+                            <tr><td>recommend</td><td>string</td><td class="badge badge-optional">否</td><td>传入 '1' 表示推荐</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/article/detail</strong> - 获取文章详情</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content"></div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/article/recommend</strong> - 获取推荐文章</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content"></div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><span class="badge badge-get">GET</span> <strong>/api/article/hot</strong> - 获取热门文章</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content"></div>
+                </div>
+            </section>
+
+            <!-- 错误码 -->
+            <section id="error-codes" class="card">
+                <h2>❌ 错误码对照表</h2>
+
+                <table>
+                    <tr>
+                        <th>状态码</th>
+                        <th>说明</th>
+                        <th>处理建议</th>
+                    </tr>
+                    <tr>
+                        <td><code>1</code></td>
+                        <td><span class="status-indicator"><span class="status-dot success"></span>成功</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>0</code></td>
+                        <td><span class="status-indicator"><span class="status-dot error"></span>失败</span></td>
+                        <td>检查请求参数</td>
+                    </tr>
+                    <tr>
+                        <td><code>1001</code></td>
+                        <td><span class="status-indicator"><span class="status-dot warning"></span>参数错误</span></td>
+                        <td>检查传入参数格式</td>
+                    </tr>
+                    <tr>
+                        <td><code>1005</code></td>
+                        <td><span class="status-indicator"><span class="status-dot warning"></span>资源未找到</span></td>
+                        <td>检查 ID 是否正确</td>
+                    </tr>
+                    <tr>
+                        <td><code>1008</code></td>
+                        <td><span class="status-indicator"><span class="status-dot error"></span>请求频率超限</span></td>
+                        <td>降低请求频率</td>
+                    </tr>
+                    <tr>
+                        <td><code>2001</code></td>
+                        <td><span class="status-indicator"><span class="status-dot error"></span>服务器内部错误</span></td>
+                        <td>联系技术支持</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- SDK 使用 -->
+            <section id="sdk" class="card">
+                <h2>🛠 SDK 使用指南</h2>
+
+                <h3>React Hooks 封装</h3>
+                <pre><code>import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  timeout: 10000,
+});
+
+export const useArticleList = (params = {}) => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/article/list', { params });
+      if (response.data.code === 1) {
+        setData(response.data.data.list);
+      } else {
+        setError(response.data.msg);
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [JSON.stringify(params)]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+};</code></pre>
+
+                <h3>Vue Composable 封装</h3>
+                <pre><code>import { ref, readonly } from 'vue';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 10000,
+});
+
+export function useApi() {
+  const loading = ref(false);
+  const error = ref(null);
+
+  async function request(method, url, params) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = method === 'get'
+        ? await api.get(url, { params })
+        : await api.post(url, params);
+      return response.data;
+    } catch (e) {
+      error.value = e.response?.data?.msg || '请求失败';
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return { request, loading: readonly(loading), error: readonly(error) };
+}</code></pre>
+            </section>
+
+            <!-- 常见问题 -->
+            <section id="faq" class="card">
+                <h2>❓ 常见问题</h2>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><strong>Q1: 如何处理跨域问题？</strong></span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>API 已配置 CORS 头部，公开接口支持跨域请求，无需额外配置。</p>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><strong>Q2: 如何处理请求超时？</strong></span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <pre><code>api.get('/article/list', { timeout: 5000 });</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><strong>Q3: 如何缓存 API 响应？</strong></span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>推荐使用 SWR 或 React Query 进行数据缓存：</p>
+                        <pre><code>import useSWR from 'swr';
+
+function ArticleList() {
+  const { data } = useSWR('/api/article/list', fetcher, {
+    revalidateOnFocus: false
+  });
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span><strong>Q4: 如何实现自动重试？</strong></span>
+                        <span>▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <pre><code>import axiosRetry from 'axios-retry';
+
+axiosRetry(api, {
+  retries: 3,
+  retryDelay: (count) => count * 1000
+});</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 安全注意事项 -->
+            <section id="security" class="card">
+                <h2>🔒 安全注意事项</h2>
+
+                <div class="danger-box">
+                    <strong>⚠️ 重要提醒:</strong>
+                    <ul>
+                        <li>不要在前端代码中硬编码 API 密钥</li>
+                        <li>使用环境变量存储敏感配置</li>
+                        <li>生产环境务必启用 HTTPS</li>
+                        <li>对用户输入进行 HTML 转义</li>
+                    </ul>
+                </div>
+
+                <h3>请求签名</h3>
+                <pre><code>function createSignedRequest(params) {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const appId = process.env.API_APP_ID;
+  const secret = process.env.API_SECRET;
+  
+  const signature = generateSignature(appId, timestamp, params, secret);
+  
+  return {
+    ...params,
+    _timestamp: timestamp,
+    _appId: appId,
+    _signature: signature
+  };
+}</code></pre>
+            </section>
+
+            <!-- 性能优化 -->
+            <section id="performance" class="card">
+                <h2>⚡ 性能优化建议</h2>
+
+                <table>
+                    <tr>
+                        <th>数据类型</th>
+                        <th>缓存时间</th>
+                        <th>说明</th>
+                    </tr>
+                    <tr><td>列表数据</td><td>5 分钟</td><td>文章列表、产品列表</td></tr>
+                    <tr><td>详情数据</td><td>10 分钟</td><td>文章详情、产品详情</td></tr>
+                    <tr><td>配置信息</td><td>10 分钟</td><td>系统配置、导航菜单</td></tr>
+                    <tr><td>统计数据</td><td>1 分钟</td><td>访问统计</td></tr>
+                </table>
+
+                <div class="warning-box">
+                    <strong>💡 建议:</strong> 使用分页加载，避免一次请求过多数据；对不常变化的数据启用本地缓存。
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>FoxCMS API 文档 v1.0.0 | 最后更新: 2024-01-01</p>
+    </footer>
+
+    <!-- 回到顶部 -->
+    <button class="back-to-top" id="backToTop" title="回到顶部">↑</button>
+
+    <script>
+        // 折叠面板切换
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('active');
+                const arrow = header.querySelector('span:last-child');
+                arrow.textContent = header.parentElement.classList.contains('active') ? '▼' : '▶';
+            });
+        });
+
+        // 回到顶部按钮
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('show', window.scrollY > 300);
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
