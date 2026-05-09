@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 统一 API 响应格式，提供标准化输出
  *
  * @package app\api\lib
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\lib;

@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 包含所有核心功能的测试用例
  *
  * @package app\api\tests
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\tests;

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * - 获取反馈统计
  *
  * @package app\api\controller
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\controller;

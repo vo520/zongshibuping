@@ -14,7 +14,7 @@ declare(strict_types=1);
  * - 5xxx: 数据验证错误
  *
  * @package app\api\status
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\status;

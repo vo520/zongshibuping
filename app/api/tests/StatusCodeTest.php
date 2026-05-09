@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 测试 API 状态码定义是否正确
  *
  * @package app\api\tests
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\tests;

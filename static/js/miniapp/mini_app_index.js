@@ -1,9 +1,9 @@
 /*
- * @Descripttion : FOXCMS是一款高效的PHP多端跨平台内容管理系统
- * @Author       : FoxCMS Team
+ * @Descripttion : 高效的PHP多端跨平台内容管理系统
+ * @Author       : Team
  * @Date         : 2022-12-23 00:41:39
  * @version      : V1.08
- * @copyright    : ©2021-现在 贵州黔狐科技股份有限公司 版权所有
+ * @copyright    : ©2021-现在 
  * @LastEditTime : 2022-12-24 11:30:22
  */
 

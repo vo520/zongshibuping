@@ -11,7 +11,7 @@ declare(strict_types=1);
  * - 常用错误响应快捷方法
  *
  * @package app\api\lib
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\lib;

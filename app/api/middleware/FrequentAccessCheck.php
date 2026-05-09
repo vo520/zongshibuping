@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @Descripttion : foxCMS 是一款高效的 PHP 多端跨平台内容管理系统
+ * @Descripttion :  是一款高效的 PHP 多端跨平台内容管理系统
  * @Author : Peter
  * @Date : 2023/7/8   17:10
  * @version : V1.08

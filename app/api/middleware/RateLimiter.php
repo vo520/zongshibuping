@@ -10,7 +10,7 @@ declare(strict_types=1);
  * - 返回限流头信息供客户端参考
  *
  * @package app\api\middleware
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\middleware;

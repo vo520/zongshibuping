@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 实现熔断模式，保护系统在高负载或故障时不被压垮
  *
  * @package app\api\middleware
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\middleware;

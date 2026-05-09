@@ -4,7 +4,7 @@
  * @Author       : QianFox Team
  * @Date         : 2025-09-25 10:46:48
  * @Version      : V1.24
- * @Copyright    : ©2021-现在 贵州黔狐科技股份有限公司 版权所有
+ * @Copyright    : ©2021-现在 
  * @LastEditors  : QianFox Team
  * @LastEditTime : 2025-11-07 17:52:48
  */

@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 用于在控制器中抛出需要返回特定响应的异常
  *
  * @package app\api\exception
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\exception;

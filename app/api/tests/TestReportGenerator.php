@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 生成 API 测试报告，包括测试用例执行结果
  *
  * @package app\api\tests
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\tests;

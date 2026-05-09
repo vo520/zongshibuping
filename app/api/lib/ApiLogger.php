@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 提供完整的 API 请求/响应日志记录功能
  *
  * @package app\api\lib
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\lib;

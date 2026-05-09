@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 测试所有 API 控制器的核心功能
  *
  * @package app\api\tests
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\tests;

@@ -14,7 +14,7 @@ declare(strict_types=1);
  * - 手机号验证
  *
  * @package app\api\lib
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\lib;

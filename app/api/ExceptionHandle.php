@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 统一处理 API 模块中的所有异常，返回格式化的 JSON 错误响应
  *
  * @package app\api
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api;

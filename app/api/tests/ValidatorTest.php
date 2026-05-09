@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 测试参数验证工具类的各项功能
  *
  * @package app\api\tests
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\tests;

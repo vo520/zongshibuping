@@ -7,7 +7,7 @@ declare(strict_types=1);
  * 测试响应格式是否符合规范
  *
  * @package app\api\tests
- * @author  FoxCMS Team
+ * @author  Team
  * @version 1.0
  */
 namespace app\api\tests;
