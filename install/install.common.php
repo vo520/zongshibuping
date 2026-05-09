@@ -3,10 +3,10 @@
 /**
  * 获取安装步骤
  * @Descripttion : FOXCMS 是一款高效的 PHP 多端跨平台内容管理系统
- * @Author : Team
+ * @Author : Peter
  * @Date : 2022/6/27   8:26
  * @version : V1.08
- * @copyright : ©2021-现在 
+ * @copyright : ©2026
  * @LastEditTime : 2022/6/27   8:26
  */
 function getStep()
