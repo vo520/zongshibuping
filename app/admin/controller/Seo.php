@@ -1,7 +1,7 @@
 <?php
 
     /**
-     * @Descripttion : FOXCMS 是一款高效的 PHP 多端跨平台内容管理系统
+     * @Descripttion : PHP 多端跨平台内容管理系统
      * @Author : Peter
      * @Date : 2023/3/12   10:19
      * @version : V1.08

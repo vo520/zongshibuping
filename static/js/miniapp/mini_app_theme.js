@@ -3,7 +3,7 @@
  * @Author       : Team
  * @Date         : 2022-12-20 15:53:25
  * @version      : V1.08
- * @copyright    : ©2021-现在 
+ * @copyright    : @2026 
  * @LastEditTime : 2022-12-20 21:39:11
  */
 $(document).on('click', '.theme-color-list .color-item', function () {

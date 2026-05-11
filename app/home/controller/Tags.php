@@ -4,13 +4,13 @@
  * @Author       : QianFox Team
  * @Date         : 2024-12-05 11:01:21
  * @Version      : V1.24
- * @Copyright    : ©2021-现在 
+ * @Copyright    : @2026 
  * @LastEditors  : QianFox Team
  * @LastEditTime : 2024-12-10 10:21:39
  */
 
 /**
- * @Descripttion : FOXCMS 是一款高效的 PHP 多端跨平台内容管理系统
+ * @Descripttion : PHP 多端跨平台内容管理系统
  * @Author : Peter
  * @Date : 2023/6/26   19:20
  * @version : V1.08
