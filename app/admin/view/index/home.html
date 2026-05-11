@@ -29,27 +29,6 @@
             <div class="foxui-col-xs-24 foxui-col-sm-24 foxui-col-xxl-24">
                 <div class="section section-panel">
                     <div class="foxui-row">
-                        <div class="foxui-col-xs-10 foxui-col-sm-10">
-                            <!-- banner尺寸：970px * 340px -->
-                            <div class="foxui-carousel carousel ad" data-autoplay="3000">
-                                <div class="foxui-carousel-wrapper slide">
-
-                                    {foreach $adList as $key=>$vo}
-                                    <div class="foxui-carousel-slide">
-                                        <div class="carousel-img-box">
-                                            <a href="{$vo->link}" target="_blank">
-                                                <img src="{$vo->img_url}" alt="{$vo->title}" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                    {/foreach}
-
-                                </div>
-                                <div class="foxui-carousel-button-prev"></div>
-                                <div class="foxui-carousel-button-next"></div>
-                                <div class="foxui-carousel-pagination is-dots"></div>
-                            </div>
-                        </div>
                         <div class="foxui-col-xs-14 foxui-col-sm-14">
                             <div class="serve-info">
                                 <div class="title">
@@ -59,7 +38,6 @@
                                             <i class="foxui-icon-bianji-o"></i>
                                         </a>
                                     </h2>
-                                    <p>{$basic.url_prefix}{$basic.url}</p>
                                 </div>
                                 <ul class="content">
                                     <li class="item">
