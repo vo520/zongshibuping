@@ -42,7 +42,7 @@
                                 <i class="foxui-icon-zhengque-f color-success"></i>
                             </div>
                             <h1>安装完成!</h1>
-                            <p>恭喜您，已成功安装黔狐内容管理系统</p>
+                            <p>恭喜您，已成功安装内容管理系统</p>
                             <p class="foxui-margin-top-12">请牢记您的后台入口</p>
                             <div class="foxui-input-group margin-top-46"
                                  style="background-color: #f4f4f5;
