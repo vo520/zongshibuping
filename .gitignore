@@ -5,6 +5,7 @@
 /config/cfg/
 /install/install.lock
 /.env
+/.trae/
 .DS_Store
 *.log
 *.swp
