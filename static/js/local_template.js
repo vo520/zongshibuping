@@ -14,7 +14,7 @@
 
 // 未安装
 // const webUninstalledDataList = [
-//     { id: 1, title: '广告公司网站源码传媒公司', author: '黔狐掌柜', src: 'https://file.liuzhifang.com/web/web05.jpg', type: '4' },
+//     { id: 1, title: '广告公司网站源码传媒公司', author: 'Peter', src: 'https://file.liuzhifang.com/web/web05.jpg', type: '4' },
 // ];
 
 //初始化模板查询

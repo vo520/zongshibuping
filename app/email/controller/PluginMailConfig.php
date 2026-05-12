@@ -79,13 +79,13 @@ class PluginMailConfig extends AdminApplyBase
 </head>
 <body>
     <div class='container'>
-        <h1>尊敬的FoxCMS用户</h1>
+        <h1>尊敬的宗师部品用户</h1>
         <p>这是一封来自您网站的通知邮件。</p>
         <p style='font-weight: bold'>您网站收到新的表单信息，请登录网后后台“应用-自定义表单”中查看。</p>
         <p>如果您有任何疑问，请随时联系我们。</p>
         <p>感谢您的支持！</p>
         <hr />
-        <p>此致<br/>黔狐团队</p>
+        <p>此致<br/>宗师部品团队</p>
     </div>
 </body>
 </html>

@@ -938,7 +938,7 @@ CREATE TABLE `fox_template` (
   `detail_id` int(11) DEFAULT NULL COMMENT '详细图id',
   `upload_template_id` int(11) DEFAULT NULL COMMENT '上传模板文件id',
   `status` tinyint(1) DEFAULT '1' COMMENT '模板1启用；0：禁用',
-  `template_source` tinyint(2) DEFAULT '0' COMMENT '模板来源0：黔狐官网；1：其它模板',
+  `template_source` tinyint(2) DEFAULT '0' COMMENT '模板来源0：官网；1：其它模板',
   `sort` int(11) DEFAULT '0' COMMENT '排序',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='前端模板表';

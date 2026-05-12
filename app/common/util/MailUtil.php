@@ -49,7 +49,7 @@ class MailUtil
         //设置发送的邮件的编码 可选GB2312 我喜欢utf-8 据说utf8在某些客户端收信下会乱码
         $mail->CharSet = 'UTF-8';
         //设置发件人姓名（昵称） 任意内容，显示在收件人邮件的发件人邮箱地址前的发件人姓名
-        $mail->FromName = '黔狐科技';
+        $mail->FromName = '宗师部品';
         //smtp登录的账号 这里填入字符串格式的qq号即可
         $mail->Username = $this->mailConfig['send_account'];
         //smtp登录的密码 使用生成的授权码（就刚才叫你保存的最新的授权码）
