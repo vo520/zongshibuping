@@ -35,14 +35,14 @@ class TagBasic extends TagBase
                 echo $basic['url_icon_url'];
                 return false;
             }elseif ($field == "aq"){
-                $val = '<a class="foxcms-aq" href="https://beian.miit.gov.cn/" target="_blank">'.$basic->$field.'</a>'.'<a style="margin-left: 10px;" href ="//www.foxcms.cn" target="_blank">'.$siteInfo.'</a>';
+                $val = '<a class="foxcms-aq" href="https://beian.miit.gov.cn/" target="_blank">'.$basic->$field.'</a>';
                 if($add == 1){
                     $val = "<a class='foxcms-aq' href='https://beian.miit.gov.cn/' target='_blank'>".$basic->$field."</a>";
                 }
                 echo $val;
                 return false;
             }elseif ($field == "copyright"){
-                $val = $basic->$field.'<a style="margin-left: 10px;" href ="//www.foxcms.cn" target="_blank">'.$siteInfo.'</a>';
+                $val = $basic->$field.' ';
                 if($add == 1){
                     $val = $basic->$field;
                 }
