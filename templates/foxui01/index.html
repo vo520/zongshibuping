@@ -345,71 +345,65 @@
     <script src="_STATIC_/skin/js/form.js"></script>
 
     <script>
-        setTimeout(() => {
-            new Swiper('.index-swiper-pc', {
-                loop: true,
-                autoplay: true,
-                pagination: {
-                    el: '.index-swiper-pc .swiper-pagination',
-                },
-                navigation: {
-                    nextEl: '.index-swiper-pc .swiper-button-next',
-                    prevEl: '.index-swiper-pc .swiper-button-prev',
-                },
-            });
+        $(document).ready(function() {
+            if (FoxModules && FoxModules.SwiperHelper) {
+                const swiperConfigs = [
+                    {
+                        el: '.index-swiper-pc',
+                        loop: true,
+                        autoplay: true,
+                        pagination: '.index-swiper-pc .swiper-pagination',
+                        navigation: {
+                            nextEl: '.index-swiper-pc .swiper-button-next',
+                            prevEl: '.index-swiper-pc .swiper-button-prev',
+                        },
+                    },
+                    {
+                        el: '.index-swiper-h5',
+                        loop: true,
+                        autoplay: true,
+                    },
+                    {
+                        el: '.enterprise-swiper',
+                        slidesPerView: 1,
+                        spaceBetween: 30,
+                        breakpoints: { 991: { slidesPerView: 3 } },
+                        pagination: '.enterprise-swiper .swiper-pagination',
+                        navigation: {
+                            nextEl: '.enterprise-swiper .swiper-button-next',
+                            prevEl: '.enterprise-swiper .swiper-button-prev',
+                        },
+                    },
+                    {
+                        el: '.industry-swiper',
+                        slidesPerView: 1,
+                        spaceBetween: 30,
+                        breakpoints: { 991: { slidesPerView: 3 } },
+                        pagination: '.industry-swiper .swiper-pagination',
+                        navigation: {
+                            nextEl: '.industry-swiper .swiper-button-next',
+                            prevEl: '.industry-swiper .swiper-button-prev',
+                        },
+                    },
+                    {
+                        el: '.media-swiper',
+                        slidesPerView: 1,
+                        spaceBetween: 30,
+                        breakpoints: { 991: { slidesPerView: 3 } },
+                        pagination: '.media-swiper .swiper-pagination',
+                        navigation: {
+                            nextEl: '.media-swiper .swiper-button-next',
+                            prevEl: '.media-swiper .swiper-button-prev',
+                        },
+                    },
+                ];
 
-            new Swiper('.index-swiper-h5', {
-                loop: true,
-                autoplay: true,
-            });
+                FoxModules.SwiperHelper.initMultiple(swiperConfigs);
+            }
 
-            new Swiper('.enterprise-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 30,
-                breakpoints: {
-                    991: { slidesPerView: 3 },
-                },
-                pagination: {
-                    el: '.enterprise-swiper .swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.enterprise-swiper .swiper-button-next',
-                    prevEl: '.enterprise-swiper .swiper-button-prev',
-                },
-            });
-
-            new Swiper('.industry-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 30,
-                breakpoints: {
-                    991: { slidesPerView: 3 },
-                },
-                pagination: {
-                    el: '.industry-swiper .swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.industry-swiper .swiper-button-next',
-                    prevEl: '.industry-swiper .swiper-button-prev',
-                },
-            });
-
-            new Swiper('.media-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 30,
-                breakpoints: {
-                    991: { slidesPerView: 3 },
-                },
-                pagination: {
-                    el: '.media-swiper .swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.media-swiper .swiper-button-next',
-                    prevEl: '.media-swiper .swiper-button-prev',
-                },
-            });
-        }, 300);
+            if (FoxModules && FoxModules.LazyLoad) {
+                FoxModules.LazyLoad.init();
+            }
+        });
     </script>
 </html>

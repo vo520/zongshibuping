@@ -30,7 +30,7 @@
 </div>
 
 <script>
-    $(function () {
+    $(document).ready(function() {
         foxui.confirmtip({
             el: '.fixed-nav .message',
             title: '留言给我们',
@@ -55,16 +55,20 @@
             placement: ['left', 'center'],
             className: 'fixed-btn-wrapper',
         });
-    });
 
-    $(document).on('click', '.foxcms-fixed-container .fixed-top', function () {
-        $(window).scrollTop(0);
+        $(document).on('click', '.foxcms-fixed-container .fixed-top', function () {
+            if (FoxModules && FoxModules.UI) {
+                FoxModules.UI.scrollToTop(500);
+            } else {
+                $('html, body').animate({ scrollTop: 0 }, 500);
+            }
+        });
     });
 
     function _messageHtml() {
         return [
             '<div class="message">',
-            '<form action="/plus/Diyform/receive" method="post">',
+            '<form action="/plus/Diyform/receive" method="post" class="fixed-message-form">',
             '<input type="hidden" name="id" style="flex: 1" value="1" />',
             '<div class="input-item">',
             '<input type="text" name="text0" placeholder="阁下贵姓" autocomplete="off" value="" />',

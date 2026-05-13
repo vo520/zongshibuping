@@ -168,32 +168,34 @@
     <script src="_STATIC_/skin/js/foxui-1.21.min.js"></script>
     <script src="_STATIC_/skin/js/common.js"></script>
     <script>
-        setTimeout(() => {
-            new Swiper('.recommend-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 30,
-                breakpoints: {
-                    991: { slidesPerView: 3 },
-                },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-            });
-        }, 300);
+        $(document).ready(function() {
+            if (FoxModules && FoxModules.SwiperHelper) {
+                FoxModules.SwiperHelper.initMultiple([{
+                    el: '.recommend-swiper',
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    breakpoints: { 991: { slidesPerView: 3 } },
+                    pagination: '.swiper-pagination',
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                }]);
+            }
 
-        $(document).on('click', '.wx-share', function () {
-            shareWeixin();
-        });
-        $(document).on('click', '.qq-share', function () {
-            shareQQ('', '[$article.title]');
-        });
-        $(document).on('click', '.xl-share', function () {
-            shareSina('', '[$article.title]');
+            $(document).on('click', '.wx-share', function () {
+                FoxModules && FoxModules.Share ? FoxModules.Share.weixin() : shareWeixin();
+            });
+            $(document).on('click', '.qq-share', function () {
+                FoxModules && FoxModules.Share ? FoxModules.Share.qq('', '[$article.title]') : shareQQ('', '[$article.title]');
+            });
+            $(document).on('click', '.xl-share', function () {
+                FoxModules && FoxModules.Share ? FoxModules.Share.sina('', '[$article.title]') : shareSina('', '[$article.title]');
+            });
+
+            if (FoxModules && FoxModules.LazyLoad) {
+                FoxModules.LazyLoad.init();
+            }
         });
     </script>
 </html>

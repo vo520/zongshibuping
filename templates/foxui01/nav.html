@@ -180,76 +180,89 @@
     </div>
 </div>
 <script>
-    new Swiper('.nav-swiper-image', {
-        slidesPerView: 2.5,
-        spaceBetween: 16,
-        freeMode: true,
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            992: { slidesPerView: 5.5 },
-        },
-    });
-
-    $(document).on('click', '.foxcms-header-pc .search-icon', function () {
-        let $container = $(this).closest('.foxcms-header-pc');
-        $container.find('.nav, .phone').fadeOut(300);
-        $container.find('.search').fadeIn(300);
-        $container.find('.foxcms-search').slideDown(300);
-    });
-    $(document).on('click', '.foxcms-header-pc .search-close', function () {
-        let $container = $(this).closest('.foxcms-header-pc');
-        $container.find('.nav, .phone').fadeIn(300);
-        $container.find('.search').fadeOut(300);
-        $container.find('.foxcms-search').slideUp(300);
-    });
-
-    $(document).on('click', '.foxcms-header-pc .search-menu .list a', function () {
-        $('.foxcms-header-pc .foxui-input-group input[name="keyword"]').val($(this).text());
-        $('.foxcms-search input[type="submit"]').click();
-    });
-
-    $(document).on('click', '.foxcms-header-h5 .foxui-icon-liebiao-o', function () {
-        let $this = $(this),
-            $container = $this.closest('.foxcms-header-h5');
-        $container.find('.search-menu').slideUp(300);
-        $this.removeClass('foxui-icon-liebiao-o').addClass('foxui-icon-guanbi-o');
-        $container.find('.nav-mask').fadeIn(300);
-        $container.find('.nav-menu').slideDown(300);
-        $('body').css('overflow', 'hidden');
-    });
-    $(document).on('click', '.foxcms-header-h5 .foxui-icon-guanbi-o', function () {
-        let $this = $(this),
-            $container = $this.closest('.foxcms-header-h5');
-        $this.removeClass('foxui-icon-guanbi-o').addClass('foxui-icon-liebiao-o');
-        $container.find('.nav-mask').fadeOut(300);
-        $container.find('.nav-menu').slideUp(300);
-        $('body').css('overflow', 'auto');
-    });
-
-    $(document).on('click', '.foxcms-header-h5 .nav-mask', function () {
-        $('.foxcms-header-h5 .foxui-icon-guanbi-o').click();
-        let $container = $(this).closest('.foxcms-header-h5');
-        if ($container.find('.search-menu').css('display') === 'block') {
-            $container.find('.nav-mask').fadeOut(300);
-            $container.find('.search-menu').slideUp(300);
-            $('body').css('overflow', 'auto');
+    $(document).ready(function() {
+        if (FoxModules && FoxModules.SwiperHelper) {
+            FoxModules.SwiperHelper.initMultiple([{
+                el: '.nav-swiper-image',
+                slidesPerView: 2.5,
+                spaceBetween: 16,
+                freeMode: true,
+                pagination: '.swiper-pagination',
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: { 992: { slidesPerView: 5.5 } },
+            }]);
         }
-    });
 
-    $(document).on('click', '.foxcms-header-h5 .foxui-icon-sousuo-o', function () {
-        let $this = $(this),
-            $container = $this.closest('.foxcms-header-h5');
-        $container.find('.foxui-icon-guanbi-o').removeClass('foxui-icon-guanbi-o').addClass('foxui-icon-liebiao-o');
-        $container.find('.nav-menu').slideUp(300);
-        $container.find('.nav-mask').fadeIn(300);
-        $container.find('.search-menu').slideDown(300);
-        $('body').css('overflow', 'hidden');
+        const debounce = FoxModules && FoxModules.Debounce ? FoxModules.Debounce : null;
+
+        $(document).on('click', '.foxcms-header-pc .search-icon', function () {
+            const $container = $(this).closest('.foxcms-header-pc');
+            $container.find('.nav, .phone').fadeOut(300);
+            $container.find('.search').fadeOut(300);
+            $container.find('.foxcms-search').slideDown(300);
+            $container.find('input[name="keyword"]').focus();
+        });
+
+        $(document).on('click', '.foxcms-header-pc .search-close', function () {
+            const $container = $(this).closest('.foxcms-header-pc');
+            $container.find('.nav, .phone').fadeIn(300);
+            $container.find('.search').fadeIn(300);
+            $container.find('.foxcms-search').slideUp(300);
+        });
+
+        const searchSubmit = debounce ? debounce.create(function(keyword) {
+            $('.foxcms-search input[name="keyword"]').val(keyword);
+            $('.foxcms-search input[type="submit"]').click();
+        }, 200) : function(keyword) {
+            $('.foxcms-search input[name="keyword"]').val(keyword);
+            $('.foxcms-search input[type="submit"]').click();
+        };
+
+        $(document).on('click', '.foxcms-header-pc .search-menu .list a', function () {
+            searchSubmit($(this).text());
+        });
+
+        $(document).on('click', '.foxcms-header-h5 .foxui-icon-liebiao-o', function () {
+            const $this = $(this),
+                  $container = $this.closest('.foxcms-header-h5');
+            $container.find('.search-menu').slideUp(300);
+            $this.removeClass('foxui-icon-liebiao-o').addClass('foxui-icon-guanbi-o');
+            $container.find('.nav-mask').fadeIn(300);
+            $container.find('.nav-menu').slideDown(300);
+            $('body').css('overflow', 'hidden');
+        });
+
+        $(document).on('click', '.foxcms-header-h5 .foxui-icon-guanbi-o', function () {
+            const $this = $(this),
+                  $container = $this.closest('.foxcms-header-h5');
+            $this.removeClass('foxui-icon-guanbi-o').addClass('foxui-icon-liebiao-o');
+            $container.find('.nav-mask').fadeOut(300);
+            $container.find('.nav-menu').slideUp(300);
+            $('body').css('overflow', 'auto');
+        });
+
+        $(document).on('click', '.foxcms-header-h5 .nav-mask', function () {
+            $('.foxcms-header-h5 .foxui-icon-guanbi-o').click();
+            const $container = $(this).closest('.foxcms-header-h5');
+            if ($container.find('.search-menu').css('display') === 'block') {
+                $container.find('.nav-mask').fadeOut(300);
+                $container.find('.search-menu').slideUp(300);
+                $('body').css('overflow', 'auto');
+            }
+        });
+
+        $(document).on('click', '.foxcms-header-h5 .foxui-icon-sousuo-o', function () {
+            const $this = $(this),
+                  $container = $this.closest('.foxcms-header-h5');
+            $container.find('.foxui-icon-guanbi-o').removeClass('foxui-icon-guanbi-o').addClass('foxui-icon-liebiao-o');
+            $container.find('.nav-menu').slideUp(300);
+            $container.find('.nav-mask').fadeIn(300);
+            $container.find('.search-menu').slideDown(300);
+            $('body').css('overflow', 'hidden');
+            setTimeout(() => $container.find('input[name="keyword"]').focus(), 350);
+        });
     });
 </script>
