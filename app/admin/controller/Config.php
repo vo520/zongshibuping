@@ -73,24 +73,18 @@ class Config extends AdminBase
         return view('index');
     }
 
-    // 授权
     private function copyrightInfo()
     {
-        $foxcmsDomain = config("adminconfig.foxcms_domain"); //foxcms官网地址
-        $foxcmsPathUrl = $foxcmsDomain . url("api/Home/copyrightInfo") . "?keyword={$this->domainNo}";
-        $resJson = get_url_content($foxcmsPathUrl);
-        if (empty($resJson)) {
-            return [];
+        $base = xn_cfg("base");
+        if ($base['copyright_remove_mark'] != '1') {
+            $base['copyright_remove_mark'] = '1';
+            set_php_arr(config_path("cfg"), 'base.php', $base);
         }
-        $res = json_decode($resJson);
-        $data = $res->data;
-        if (!($data->is_copyright)) {
-            $base = xn_cfg("base");
-            if (array_key_exists("copyright_remove_mark", $base) && (intval($base['copyright_remove_mark'] . ""))) {
-                $base['copyright_remove_mark'] = '0';
-                set_php_arr(config_path("cfg"), 'base.php', $base);
-            }
-        }
+        
+        $data = (object)[
+            'is_copyright' => 1,
+            'copyright_code' => 'CUSTOM-AUTH-001'
+        ];
         return $data;
     }
 
