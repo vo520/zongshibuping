@@ -3,6 +3,8 @@ const FoxCommon = (function($) {
         initLazyLoad();
         initWow();
         initShareFallback();
+        initImagePreview();
+        initLightbox();
     }
 
     function initLazyLoad() {
@@ -23,6 +25,33 @@ const FoxCommon = (function($) {
             window.shareQQ = shareQQ;
             window.shareWeixin = shareWeixin;
             window.shareSina = shareSina;
+        }
+    }
+
+    function initImagePreview() {
+        if (FoxModules && FoxModules.ImagePreview && !window.imagePreviewInitialized) {
+            FoxModules.ImagePreview.init({
+                selector: '.image-preview',
+                triggerSelector: '.preview-trigger',
+                previewClass: 'preview-content',
+                position: 'top',
+                offset: 10,
+                delay: 200
+            });
+            window.imagePreviewInitialized = true;
+        }
+    }
+
+    function initLightbox() {
+        if (FoxModules && FoxModules.Lightbox && !window.lightboxInitialized) {
+            $(document).on('click', '[data-lightbox]', function(e) {
+                e.preventDefault();
+                const $this = $(this);
+                const src = $this.data('lightbox') || $this.attr('href');
+                const caption = $this.data('caption') || $this.attr('alt') || '';
+                FoxModules.Lightbox.open(src, { caption });
+            });
+            window.lightboxInitialized = true;
         }
     }
 

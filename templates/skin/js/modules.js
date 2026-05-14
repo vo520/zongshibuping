@@ -246,6 +246,10 @@ const FoxModules = (function($, Swiper) {
                 if (aspectRatio) {
                     $container.css('--aspect-ratio', aspectRatio);
                 }
+
+                if (!$img.attr('src')) {
+                    $img.attr('src', `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect fill='${encodeURIComponent(settings.placeholderColor)}' width='1' height='1'/%3E%3C/svg%3E`);
+                }
             });
 
             if ('IntersectionObserver' in window) {
@@ -471,22 +475,102 @@ const FoxModules = (function($, Swiper) {
             const settings = {
                 selector: '.image-preview',
                 triggerSelector: '.preview-trigger',
+                previewClass: 'preview-content',
+                position: 'top',
+                offset: 10,
+                delay: 200,
                 ...options
             };
 
-            $(document).on('mouseenter', settings.selector, function() {
-                const $container = $(this);
-                const $preview = $container.find('.preview-content');
-                if ($preview.length) {
-                    $preview.stop(true, true).fadeIn(200);
+            let showTimer = null;
+            let hideTimer = null;
+
+            function getPreviewPosition($trigger, $preview) {
+                const triggerRect = $trigger[0].getBoundingClientRect();
+                const previewWidth = $preview.outerWidth() || 300;
+                const previewHeight = $preview.outerHeight() || 300;
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                let left, top;
+
+                switch (settings.position) {
+                    case 'top':
+                        left = triggerRect.left + (triggerRect.width - previewWidth) / 2;
+                        top = triggerRect.top - previewHeight - settings.offset;
+                        break;
+                    case 'bottom':
+                        left = triggerRect.left + (triggerRect.width - previewWidth) / 2;
+                        top = triggerRect.bottom + settings.offset;
+                        break;
+                    case 'left':
+                        left = triggerRect.left - previewWidth - settings.offset;
+                        top = triggerRect.top + (triggerRect.height - previewHeight) / 2;
+                        break;
+                    case 'right':
+                        left = triggerRect.right + settings.offset;
+                        top = triggerRect.top + (triggerRect.height - previewHeight) / 2;
+                        break;
+                    default:
+                        left = triggerRect.left + (triggerRect.width - previewWidth) / 2;
+                        top = triggerRect.top - previewHeight - settings.offset;
                 }
+
+                if (left < 10) left = 10;
+                if (left + previewWidth > viewportWidth - 10) {
+                    left = viewportWidth - previewWidth - 10;
+                }
+                if (top < 10) top = triggerRect.bottom + settings.offset;
+                if (top + previewHeight > viewportHeight - 10) {
+                    top = viewportHeight - previewHeight - 10;
+                }
+
+                return { left, top };
+            }
+
+            function showPreview($container) {
+                clearTimeout(hideTimer);
+                showTimer = setTimeout(() => {
+                    const $trigger = $container.find(settings.triggerSelector);
+                    const $preview = $container.find('.' + settings.previewClass);
+                    if ($preview.length) {
+                        const pos = getPreviewPosition($container, $preview);
+                        $preview.css({
+                            left: pos.left + 'px',
+                            top: pos.top + 'px',
+                            display: 'block'
+                        });
+                    }
+                }, settings.delay);
+            }
+
+            function hidePreview($container) {
+                clearTimeout(showTimer);
+                hideTimer = setTimeout(() => {
+                    const $preview = $container.find('.' + settings.previewClass);
+                    if ($preview.length) {
+                        $preview.stop(true, true).fadeOut(200);
+                    }
+                }, settings.delay);
+            }
+
+            $(document).on('mouseenter', settings.selector, function() {
+                showPreview($(this));
             });
 
             $(document).on('mouseleave', settings.selector, function() {
-                const $container = $(this);
-                const $preview = $container.find('.preview-content');
-                if ($preview.length) {
-                    $preview.stop(true, true).fadeOut(200);
+                hidePreview($(this));
+            });
+
+            $(document).on('click', settings.selector + ' ' + settings.triggerSelector, function(e) {
+                e.preventDefault();
+                const $container = $(this).closest(settings.selector);
+                const $preview = $container.find('.' + settings.previewClass);
+                const $img = $preview.find('img');
+                if ($img.length) {
+                    modules.Lightbox.open($img.attr('src'), {
+                        caption: $img.attr('alt') || ''
+                    });
                 }
             });
         }
