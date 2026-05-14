@@ -14,6 +14,8 @@ return [
     'url_lazy_route'        => false,
     // 是否强制使用路由
     'url_route_must'        => false,
+    // 路由规则缓存(高性能模式)
+    'route_check_cache'     => true,
     // 合并路由规则
     'route_rule_merge'      => false,
     // 路由是否完全匹配

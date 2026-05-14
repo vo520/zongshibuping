@@ -27,7 +27,7 @@ return [
 //内置标签库名称(标签使用不必指定标签库名称),以逗号分隔 注意解析顺序
 //    'taglib_build_in'=>'Cx,app\taglib\Fox',
     //是否开启模板编译缓存,设为false则每次都会重新编译
-    'tpl_cache'=>false,
+    'tpl_cache'=>true,
     //默认模板缓存后缀
     'cache_suffix'=>'tpl'
 
