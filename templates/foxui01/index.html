@@ -1,11 +1,4 @@
-<!--
- * @Descripttion : 一款高效的PHP多端跨平台内容管理系统
- * @Author       : Team
- * @Date         : 2023-01-10 09:33:37
- * @version      : V1.08
- * @copyright    : ©2026
- * @LastEditTime : 2024-07-06 10:15:54
--->
+
 <!DOCTYPE html>
 <html lang="cn">
     <head>
@@ -98,8 +91,8 @@
                                     {fox:arclist name='av' pname='cv' calltype="parent" row="6" flag='c'}
                                     <div class="foxui-col-sm-12 foxui-col-lg-8">
                                         <a href="[$av.link]" class="list-case-item" style="display: block">
-                                            <div class="pic">
-                                                <img src="[$av.img_url]" alt="" />
+                                            <div class="pic lazy-container" data-aspect-ratio="4/3">
+                                                <img class="lazy-image" data-src="[$av.img_url]" alt="[$av.title]" />
                                                 {if $av.model == 'video'}
                                                 <i class="foxui-icon-bofang-f"></i>
                                                 {/if}
@@ -121,7 +114,7 @@
                             {/fox:channel}
                         </div>
                     </div>
-                    <div class="more-btn wow slideInUp" style="margin-top: 40px; margin-bottom: 80px">
+                    <div class="more-btn wow fadeIn" data-wow-delay="0.5s" data-wow-duration="0.4s" style="margin-top: 40px; margin-bottom: 80px">
                         <a class="more-plain-btn" href="[$field.link]">
                             <span>MORE</span>
                             <i class="foxui-icon-qianwang-o"></i>
@@ -135,12 +128,12 @@
                 <div class="foxui-row foxui-gutter-0">
                     {fox:channel name="field" typeid="7" type="self"}
                     <div class="foxui-col-md-12">
-                        <div class="pic wow slideInUp">
-                            <img src="[$field.pic_url]" alt="{fox:basic name='name'/}"/>
+                        <div class="pic wow slideInLeft lazy-container" data-wow-delay="0.1s" data-wow-duration="0.6s" data-aspect-ratio="4/3">
+                            <img class="lazy-image" data-src="[$field.pic_url]" alt="{fox:basic name='name'/}"/>
                         </div>
                     </div>
                     <div class="foxui-col-md-12">
-                        <div class="text wow slideInUp">
+                        <div class="text wow slideInRight" data-wow-delay="0.3s" data-wow-duration="0.6s">
                             <div class="text-inner">
                                 <h1>[$field.name]</h1>
                                 <h4>[$field.en_name]</h4>
@@ -179,9 +172,9 @@
                                         <div class="swiper-wrapper">
                                             {fox:article name='av' pname='cv' calltype="parent" row="6" flag='c'}
                                             <div class="swiper-slide">
-                                                <a href="[$av.link]" class="list-article-item wow slideInUp">
-                                                    <div class="pic">
-                                                        <img src="[$av.img_url]" alt="" />
+                                                <a href="[$av.link]" class="list-article-item wow zoomIn" data-wow-delay="{(($index % 3) * 0.2) + 0.1}s" data-wow-duration="0.5s">
+                                                    <div class="pic lazy-container" data-aspect-ratio="16/9">
+                                                        <img class="lazy-image" data-src="[$av.img_url]" alt="[$av.title]" />
                                                     </div>
                                                     <div class="text">
                                                         <div class="info">
@@ -244,9 +237,9 @@
                         <div class="foxui-row foxui-gutter-6">
                             {fox:product name='av' pname='field' type="son" calltype="parent" row="8" flag='c' model="product" orderby="release_time"}
                             <div class="foxui-col-md-12 foxui-col-lg-6">
-                                <a href="[$av.link]" class="list-product-item wow slideInUp">
-                                    <div class="pic">
-                                        <img src="[$av.img_url]" alt="" />
+                                <a href="[$av.link]" class="list-product-item wow {if $index%2 == 0}slideInLeft{else}slideInRight{/if}" data-wow-delay="{($index * 0.15) + 0.1}s" data-wow-duration="0.5s">
+                                    <div class="pic lazy-container" data-aspect-ratio="4/3">
+                                        <img class="lazy-image" data-src="[$av.img_url]" alt="[$av.title]" />
                                     </div>
                                     <div class="text">
                                         <h1 class="foxui-ellipsis">[$av.title]</h1>
@@ -290,8 +283,8 @@
                         <div class="list-customer foxui-row foxui-gutter-0">
                             {fox:article name='av' pname='field' calltype="parent" row="12" flag='c'}
                             <div class="col foxui-col-xs-12 foxui-col-sm-8 foxui-col-lg-6 foxui-col-xxl-4">
-                                <div class="pic wow slideInUp">
-                                    <img src="[$av.img_url]" alt="" />
+                                <div class="pic wow {if $index%3 == 0}fadeIn{elseif $index%3 == 1}slideInLeft{else}slideInRight{/if} lazy-container" data-wow-delay="{($index * 0.1) + 0.1}s" data-wow-duration="0.4s" data-aspect-ratio="16/9">
+                                    <img class="lazy-image" data-src="[$av.img_url]" alt="[$av.title]" />
                                 </div>
                             </div>
                             {/fox:article}
@@ -302,7 +295,7 @@
             </div>
             <!-- 需求表单 -->
             <div class="foxcms-container requried-container">
-                <div class="foxui-bg-white required-form wow slideInUp">
+                <div class="foxui-bg-white required-form wow bounceInUp" data-wow-delay="0.3s" data-wow-duration="0.6s">
                     <form id="requiredForm" action="/plus/Diyform/receive" method="post">
                         <input type="hidden" name="id" style="flex: 1" value="1" />
                         <div class="foxui-row foxui-gutter-6">
@@ -338,7 +331,7 @@
             <div class="foxcms-fixed-container">{include file="fixed"/}</div>
         </main>
         <!-- 底部 -->
-        <footer class="wow slideInUp">{include file="footer"/}</footer>
+        <footer class="wow fadeInUp" data-wow-delay="0.4s" data-wow-duration="0.5s">{include file="footer"/}</footer>
     </body>
     <script src="_STATIC_/skin/js/foxui-1.21.min.js"></script>
     <script src="_STATIC_/skin/js/common.js"></script>
@@ -346,63 +339,66 @@
 
     <script>
         $(document).ready(function() {
-            if (FoxModules && FoxModules.SwiperHelper) {
-                const swiperConfigs = [
-                    {
-                        el: '.index-swiper-pc',
-                        loop: true,
-                        autoplay: true,
-                        pagination: '.index-swiper-pc .swiper-pagination',
-                        navigation: {
-                            nextEl: '.index-swiper-pc .swiper-button-next',
-                            prevEl: '.index-swiper-pc .swiper-button-prev',
-                        },
+            if (typeof Swiper !== 'undefined') {
+                new Swiper('.index-swiper-pc', {
+                    loop: true,
+                    autoplay: true,
+                    pagination: {
+                        el: '.index-swiper-pc .swiper-pagination',
+                        clickable: true,
                     },
-                    {
-                        el: '.index-swiper-h5',
-                        loop: true,
-                        autoplay: true,
+                    navigation: {
+                        nextEl: '.index-swiper-pc .swiper-button-next',
+                        prevEl: '.index-swiper-pc .swiper-button-prev',
                     },
-                    {
-                        el: '.enterprise-swiper',
-                        slidesPerView: 1,
-                        spaceBetween: 30,
-                        breakpoints: { 991: { slidesPerView: 3 } },
-                        pagination: '.enterprise-swiper .swiper-pagination',
-                        navigation: {
-                            nextEl: '.enterprise-swiper .swiper-button-next',
-                            prevEl: '.enterprise-swiper .swiper-button-prev',
-                        },
-                    },
-                    {
-                        el: '.industry-swiper',
-                        slidesPerView: 1,
-                        spaceBetween: 30,
-                        breakpoints: { 991: { slidesPerView: 3 } },
-                        pagination: '.industry-swiper .swiper-pagination',
-                        navigation: {
-                            nextEl: '.industry-swiper .swiper-button-next',
-                            prevEl: '.industry-swiper .swiper-button-prev',
-                        },
-                    },
-                    {
-                        el: '.media-swiper',
-                        slidesPerView: 1,
-                        spaceBetween: 30,
-                        breakpoints: { 991: { slidesPerView: 3 } },
-                        pagination: '.media-swiper .swiper-pagination',
-                        navigation: {
-                            nextEl: '.media-swiper .swiper-button-next',
-                            prevEl: '.media-swiper .swiper-button-prev',
-                        },
-                    },
-                ];
+                });
 
-                FoxModules.SwiperHelper.initMultiple(swiperConfigs);
-            }
+                new Swiper('.index-swiper-h5', {
+                    loop: true,
+                    autoplay: true,
+                });
 
-            if (FoxModules && FoxModules.LazyLoad) {
-                FoxModules.LazyLoad.init();
+                new Swiper('.enterprise-swiper', {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    breakpoints: { 991: { slidesPerView: 3 } },
+                    pagination: {
+                        el: '.enterprise-swiper .swiper-pagination',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.enterprise-swiper .swiper-button-next',
+                        prevEl: '.enterprise-swiper .swiper-button-prev',
+                    },
+                });
+
+                new Swiper('.industry-swiper', {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    breakpoints: { 991: { slidesPerView: 3 } },
+                    pagination: {
+                        el: '.industry-swiper .swiper-pagination',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.industry-swiper .swiper-button-next',
+                        prevEl: '.industry-swiper .swiper-button-prev',
+                    },
+                });
+
+                new Swiper('.media-swiper', {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    breakpoints: { 991: { slidesPerView: 3 } },
+                    pagination: {
+                        el: '.media-swiper .swiper-pagination',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.media-swiper .swiper-button-next',
+                        prevEl: '.media-swiper .swiper-button-prev',
+                    },
+                });
             }
         });
     </script>

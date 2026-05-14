@@ -1,7 +1,15 @@
 const FoxCommon = (function($) {
     function init() {
+        initLazyLoad();
         initWow();
         initShareFallback();
+    }
+
+    function initLazyLoad() {
+        if (FoxModules && FoxModules.LazyLoad && !window.lazyLoadInitialized) {
+            FoxModules.LazyLoad.init();
+            window.lazyLoadInitialized = true;
+        }
     }
 
     function initWow() {
@@ -44,7 +52,7 @@ const FoxCommon = (function($) {
         if (typeof foxui !== 'undefined') {
             foxui.dialog({
                 title: '微信',
-                content: `<div class="foxui-display-flex foxui-justify-content-center"><img width="180" src="${targetUrl}"/></div>`,
+                content: `<div class="foxui-display-flex foxui-justify-content-center"><img width="180" src="${targetUrl}" alt="微信分享二维码"/></div>`,
                 width: '340px',
             });
         }

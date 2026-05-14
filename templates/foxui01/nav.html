@@ -1,7 +1,7 @@
 <div class="foxcms-container foxcms-header-pc foxui-hidden-sm foxui-hidden-xs">
     <div class="foxcms-logo">
         <div class="logo">
-            <img style="height: 28px" src="{fox:basic name='web_logo'/}" alt="" />
+            <img style="height: 28px" src="{fox:basic name='web_logo'/}" alt="{fox:basic name='name'/}" />
         </div>
         
     </div>
@@ -45,8 +45,8 @@
                                     {fox:arclist name='v' type="son" calltype="parent" flag="c" apply="nav" addfields="author,team_status" row="12"}
                                     <div class="swiper-slide">
                                         <a href="[$v.link]" class="swiper-content foxui-link">
-                                            <div class="{if $field.id == 4} case-img {else/} product-img {/if}">
-                                                <img src="[$v.img_url]" alt="" />
+                                            <div class="{if $field.id == 4} case-img {else/} product-img {/if} lazy-container" data-aspect-ratio="4/3">
+                                                <img class="lazy-image" data-src="[$v.img_url]" alt="[$v.title]" />
                                             </div>
                                             <p>[$v.title]</p>
                                         </a>
@@ -130,7 +130,7 @@
         <div class="nav-head foxui-border-bottom">
             <i class="foxui-icon-liebiao-o"></i>
             <a href="/" class="foxcms-logo">
-                <img style="height: 26px" src="{fox:basic name='web_logo'/}" alt="" />
+                <img style="height: 26px" src="{fox:basic name='web_logo'/}" alt="{fox:basic name='name'/}" />
             </a>
             <i class="foxui-icon-sousuo-o"></i>
         </div>
@@ -181,19 +181,21 @@
 </div>
 <script>
     $(document).ready(function() {
-        if (FoxModules && FoxModules.SwiperHelper) {
-            FoxModules.SwiperHelper.initMultiple([{
-                el: '.nav-swiper-image',
+        if (typeof Swiper !== 'undefined') {
+            new Swiper('.nav-swiper-image', {
                 slidesPerView: 2.5,
                 spaceBetween: 16,
                 freeMode: true,
-                pagination: '.swiper-pagination',
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
                 breakpoints: { 992: { slidesPerView: 5.5 } },
-            }]);
+            });
         }
 
         const debounce = FoxModules && FoxModules.Debounce ? FoxModules.Debounce : null;

@@ -1,11 +1,4 @@
-<!--
- * @Descripttion : 一款高效的PHP多端跨平台内容管理系统
- * @Author       : Team
- * @Date         : 2023-01-10 09:33:37
- * @version      : V1.08
- * @copyright    : ©2026
- * @LastEditTime : 2024-07-06 10:15:54
--->
+
 <!DOCTYPE html>
 <html lang="cn">
     <head>
@@ -29,8 +22,8 @@
                         <div class="foxui-col-sm-12 foxui-col-lg-8">
                             <a href="[$field.link]">
                                 <div class="list-case-item wow slideInUp">
-                                    <div class="pic">
-                                        <img src="[$field.img_url]" alt="" />
+                                    <div class="pic lazy-container" data-aspect-ratio="4/3">
+                                        <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                                         {if $field.model == 'video'}
                                         <i class="foxui-icon-bofang-f"></i>
                                         {/if}

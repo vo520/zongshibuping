@@ -19,7 +19,9 @@
             <p>{fox:contact name='email'/}</p>
             <p>{fox:contact name='contact_address'/}</p>
             <div class="ewm">
-                <img src="{fox:contact name='qr_code2'/}" alt="" />
+                <div class="lazy-container" data-aspect-ratio="1/1">
+                    <img class="lazy-image" data-src="{fox:contact name='qr_code2'/}" alt="微信二维码" />
+                </div>
                 <span>微信关注我们</span>
             </div>
         </div>
@@ -84,7 +86,9 @@
         <p>{fox:contact name='email'/}</p>
         <p>{fox:contact name='contact_address'/}</p>
         <div class="ewm">
-            <img src="{fox:contact name='qr_code2'/}" alt="" />
+            <div class="lazy-container" data-aspect-ratio="1/1">
+                <img class="lazy-image" data-src="{fox:contact name='qr_code2'/}" alt="微信二维码" />
+            </div>
             <span>微信关注我们</span>
         </div>
         <div class="list">

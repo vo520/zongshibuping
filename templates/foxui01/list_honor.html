@@ -1,11 +1,4 @@
-<!--
- * @Descripttion : 一款高效的PHP多端跨平台内容管理系统
- * @Author       : Team
- * @Date         : 2023-01-10 09:33:37
- * @version      : V1.08
- * @copyright    : ©2026
- * @LastEditTime : 2024-07-06 10:15:54
--->
+
 <!DOCTYPE html>
 <html lang="cn">
     <head>
@@ -29,8 +22,8 @@
                         <div class="foxui-col-md-8 foxui-col-xl-6">
                             <div class="item wow slideInUp">
                                 <div class="item-inner">
-                                    <div class="pic">
-                                        <img src="[$field.img_url]" alt="" />
+                                    <div class="pic lazy-container" data-aspect-ratio="4/3">
+                                        <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                                     </div>
                                     <div class="text">
                                         <h3 class="foxui-ellipsis">[$field.title]</h3>
@@ -52,27 +45,26 @@
     <script src="_STATIC_/skin/js/common.js"></script>
 
     <script>
-        let honorImgList = [],
-            honorIndex = -1;
-
         $(document).on('click', '.list-honor-main .item', function () {
-            honorIndex = $(this).parent().index();
+            const honorIndex = $(this).parent().index();
+            const honorImgList = [];
             $('.list-honor-main .item img').each(function () {
+                const $img = $(this);
                 honorImgList.push({
-                    src: $(this).attr('src'),
-                    text: $(this).closest('.item-inner').find('h3').text(),
+                    src: $img.attr('data-src') || $img.attr('src'),
+                    text: $img.closest('.item-inner').find('h3').text(),
                 });
             });
             foxui.dialog({
                 title: honorImgList[honorIndex].text,
-                content: _honorViewHtml(honorIndex),
+                content: _honorViewHtml(honorImgList, honorIndex),
                 marginTop: '12vh',
                 className: 'honor-dialog',
             });
         });
 
-        function _honorViewHtml(index) {
-            return ['<div class="honor-dialog-content">', '<div class="pic">', `<img src="${honorImgList[index].src}"/>`, '</div>', '</div>'].join('');
+        function _honorViewHtml(imgList, index) {
+            return ['<div class="honor-dialog-content">', '<div class="pic">', `<img src="${imgList[index].src}" alt="${imgList[index].text || ''}"/>`, '</div>', '</div>'].join('');
         }
     </script>
 </html>

@@ -42,7 +42,7 @@
 
         foxui.confirmtip({
             el: '.fixed-nav .ewm',
-            content: `<img src="{fox:contact name='qr_code1'/}"/>`,
+            content: `<div class="lazy-container" data-aspect-ratio="1/1"><img class="lazy-image" data-src="{fox:contact name='qr_code1'/}" alt="二维码"/></div>`,
             trigger: 'hover',
             placement: ['left', 'center'],
             className: 'fixed-btn-wrapper',

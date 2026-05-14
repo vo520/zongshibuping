@@ -167,8 +167,8 @@
                                 <div class="swiper-slide">
                                     <a href="[$field.link]">
                                         <div class="list-case-item wow slideInUp">
-                                            <div class="pic">
-                                                <img src="[$field.img_url]" alt="" />
+                                            <div class="pic lazy-container" data-aspect-ratio="16/9">
+                                                <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                                                 {if $field.model == 'video'}
                                                 <i class="foxui-icon-bofang-f"></i>
                                                 {/if}

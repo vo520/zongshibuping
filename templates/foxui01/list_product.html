@@ -1,11 +1,4 @@
-<!--
- * @Descripttion : 一款高效的PHP多端跨平台内容管理系统
- * @Author       : Team
- * @Date         : 2023-01-10 09:33:37
- * @version      : V1.08
- * @copyright    : ©2026
- * @LastEditTime : 2024-07-06 10:15:54
--->
+
 <!DOCTYPE html>
 <html lang="cn">
     <head>
@@ -28,8 +21,8 @@
                         <div class="foxui-row foxui-gutter-0 foxui-align-items-center">
                             {fox:product name="field" row="6" flag="c" addfields="price"}
                             <div class="recommend-item foxui-col-md-13 {if $index%2 != 0} foxui-push-md-11 {/if} wow slideInUp">
-                                <a href="[$field.link]" class="pic">
-                                    <img src="[$field.big_img]" alt="" />
+                                <a href="[$field.link]" class="pic lazy-container" data-aspect-ratio="16/9">
+                                    <img class="lazy-image" data-src="[$field.big_img]" alt="[$field.title]" />
                                 </a>
                             </div>
                             <div class="recommend-item foxui-col-md-11 {if $index%2 != 0} foxui-pull-md-13 {/if} wow slideInUp">
@@ -59,8 +52,8 @@
                             {fox:product name='field' addfields="price"}
                             <div class="foxui-col-md-8 foxui-col-xl-6">
                                 <a href="[$field.link]" class="list-product-item wow slideInUp" data-wow-delay="0.1s">
-                                    <div class="pic">
-                                        <img src="[$field.img_url]" alt="" />
+                                    <div class="pic lazy-container" data-aspect-ratio="4/3">
+                                        <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                                     </div>
                                     <div class="text">
                                         <h1 class="foxui-ellipsis">[$field.title]</h1>

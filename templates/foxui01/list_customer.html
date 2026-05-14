@@ -1,11 +1,4 @@
-<!--
- * @Descripttion : 一款高效的PHP多端跨平台内容管理系统
- * @Author       : Team
- * @Date         : 2023-01-10 09:33:37
- * @version      : V1.08
- * @copyright    : ©2026
- * @LastEditTime : 2024-07-06 10:15:54
--->
+
 <!DOCTYPE html>
 <html lang="cn">
     <head>
@@ -27,8 +20,8 @@
                     <div class="list-customer foxui-row foxui-gutter-0">
                         {fox:article name='field'}
                         <div class="col foxui-col-xs-12 foxui-col-sm-8 foxui-col-lg-6 foxui-col-xxl-4">
-                            <div class="pic wow slideInUp">
-                                <img src="[$field.img_url]" alt="" />
+                            <div class="pic wow slideInUp lazy-container" data-aspect-ratio="16/9">
+                                <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                             </div>
                         </div>
                         {/fox:article}
