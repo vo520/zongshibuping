@@ -17,10 +17,10 @@
             <!-- 内容 -->
             <div class="foxcms-main list-customer-main foxui-bg-white">
                 <div class="foxcms-container">
-                    <div class="list-customer foxui-row foxui-gutter-0">
+                    <div class="foxcms-customer-grid">
                         {fox:article name='field'}
-                        <div class="col foxui-col-xs-12 foxui-col-sm-8 foxui-col-lg-6 foxui-col-xxl-4">
-                            <div class="pic wow slideInUp lazy-container" data-aspect-ratio="16/9">
+                        <div class="foxcms-customer-item wow slideInUp" data-wow-delay="{($index * 0.1) + 0.1}s" data-wow-duration="0.4s">
+                            <div class="foxcms-customer-pic lazy-container">
                                 <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                             </div>
                         </div>

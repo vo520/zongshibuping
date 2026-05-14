@@ -264,7 +264,7 @@
                 </div>
             </div>
             <!-- 合作客户 -->
-            <div class="more-section foxui-bg-white">
+            <div class="more-section foxui-bg-white foxcms-responsive-padding">
                 <div class="foxcms-container">
                     {fox:channel name="field" typeid="10" type="self"}
                     <div class="more-section-head">
@@ -280,10 +280,10 @@
                         </div>
                     </div>
                     <div class="more-section-list">
-                        <div class="list-customer foxui-row foxui-gutter-0">
+                        <div class="foxcms-customer-grid">
                             {fox:article name='av' pname='field' calltype="parent" row="12" flag='c'}
-                            <div class="col foxui-col-xs-12 foxui-col-sm-8 foxui-col-lg-6 foxui-col-xxl-4">
-                                <div class="pic wow {if $index%3 == 0}fadeIn{elseif $index%3 == 1}slideInLeft{else}slideInRight{/if} lazy-container" data-wow-delay="{($index * 0.1) + 0.1}s" data-wow-duration="0.4s" data-aspect-ratio="16/9">
+                            <div class="foxcms-customer-item wow {if $index%3 == 0}fadeIn{elseif $index%3 == 1}slideInLeft{else}slideInRight{/if}" data-wow-delay="{($index * 0.1) + 0.1}s" data-wow-duration="0.4s">
+                                <div class="foxcms-customer-pic lazy-container">
                                     <img class="lazy-image" data-src="[$av.img_url]" alt="[$av.title]" />
                                 </div>
                             </div>
