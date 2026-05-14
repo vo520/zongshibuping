@@ -187,13 +187,56 @@ const FoxModules = (function($, Swiper) {
             const settings = {
                 selector: 'img[data-src]',
                 excludeSelector: '.no-lazy, [data-lazy-ignore]',
-                threshold: 200,
+                threshold: 300,
                 placeholderColor: '#f5f7fa',
                 errorPlaceholder: '',
                 ...options
             };
 
             const $images = $(settings.selector).not(settings.excludeSelector);
+
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                return (
+                    rect.top < window.innerHeight &&
+                    rect.bottom > 0 &&
+                    rect.left < window.innerWidth &&
+                    rect.right > 0
+                );
+            }
+
+            function loadImage(img, $img, $container) {
+                const src = $img.attr('data-src');
+                const srcset = $img.attr('data-srcset');
+
+                if (!src) return;
+
+                $img.addClass('lazy-loading');
+                if (srcset) {
+                    $img.attr('srcset', srcset).removeAttr('data-srcset');
+                }
+                $img.attr('src', src).removeAttr('data-src');
+
+                img.onload = () => {
+                    $img.removeClass('lazy-loading').addClass('lazy-loaded');
+                    $container.removeClass('lazy-loading').addClass('lazy-loaded');
+                    if ($container.hasClass('wow') && !$container.hasClass('animated')) {
+                        $container.addClass('animated');
+                    }
+                    $img.trigger('lazyload:complete');
+                };
+                img.onerror = () => {
+                    $img.removeClass('lazy-loading').addClass('lazy-error');
+                    $container.removeClass('lazy-loading').addClass('lazy-loaded');
+                    if ($container.hasClass('wow') && !$container.hasClass('animated')) {
+                        $container.addClass('animated');
+                    }
+                    if (settings.errorPlaceholder) {
+                        $img.attr('src', settings.errorPlaceholder);
+                    }
+                    $img.trigger('lazyload:error');
+                };
+            }
 
             $images.each((_, img) => {
                 const $img = $(img);
@@ -202,10 +245,6 @@ const FoxModules = (function($, Swiper) {
 
                 if (aspectRatio) {
                     $container.css('--aspect-ratio', aspectRatio);
-                }
-
-                if (!$img.attr('src')) {
-                    $img.attr('src', `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect fill='${encodeURIComponent(settings.placeholderColor)}' width='1' height='1'/%3E%3C/svg%3E`);
                 }
             });
 
@@ -216,62 +255,29 @@ const FoxModules = (function($, Swiper) {
                             const img = entry.target;
                             const $img = $(img);
                             const $container = $img.closest('.lazy-container');
-                            const src = $img.attr('data-src');
-                            const srcset = $img.attr('data-srcset');
-
-                            if (src) {
-                                $img.addClass('lazy-loading');
-                                
-                                if (srcset) {
-                                    $img.attr('srcset', srcset).removeAttr('data-srcset');
-                                }
-                                $img.attr('src', src).removeAttr('data-src');
-
-                                img.onload = () => {
-                                    $img.removeClass('lazy-loading').addClass('lazy-loaded');
-                                    $container.removeClass('lazy-loading').addClass('lazy-loaded');
-                                    if ($container.hasClass('wow') && !$container.hasClass('animated')) {
-                                        $container.addClass('animated');
-                                    }
-                                    $img.trigger('lazyload:complete');
-                                };
-                                img.onerror = () => {
-                                    $img.removeClass('lazy-loading').addClass('lazy-error');
-                                    $container.removeClass('lazy-loading').addClass('lazy-loaded');
-                                    if ($container.hasClass('wow') && !$container.hasClass('animated')) {
-                                        $container.addClass('animated');
-                                    }
-                                    if (settings.errorPlaceholder) {
-                                        $img.attr('src', settings.errorPlaceholder);
-                                    }
-                                    $img.trigger('lazyload:error');
-                                };
-                            }
-
+                            loadImage(img, $img, $container);
                             observer.unobserve(img);
                         }
                     });
                 }, {
-                    rootMargin: `${settings.threshold}px`,
+                    rootMargin: '0px 0px ' + settings.threshold + 'px 0px',
                     threshold: 0
                 });
 
                 $images.each((_, img) => {
-                    if (!img.src || img.src.startsWith('data:image/svg+xml')) {
+                    const $img = $(img);
+                    if (isInViewport(img)) {
+                        const $container = $img.closest('.lazy-container');
+                        loadImage(img, $img, $container);
+                    } else {
                         observer.observe(img);
                     }
                 });
             } else {
                 $images.each((_, img) => {
                     const $img = $(img);
-                    const src = $img.attr('data-src');
-                    const srcset = $img.attr('data-srcset');
-                    if (src) {
-                        if (srcset) {
-                            $img.attr('srcset', srcset).removeAttr('data-srcset');
-                        }
-                        $img.attr('src', src).removeAttr('data-src').addClass('lazy-loaded');
-                    }
+                    const $container = $img.closest('.lazy-container');
+                    loadImage(img, $img, $container);
                 });
             }
         },
@@ -574,3 +580,10 @@ const FoxModules = (function($, Swiper) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = FoxModules;
 }
+
+$(document).ready(function() {
+    if (!window.lazyLoadInitialized) {
+        FoxModules.LazyLoad.init();
+        window.lazyLoadInitialized = true;
+    }
+});
