@@ -45,6 +45,8 @@
         let currentColumn = null;
         let sections = [];
         let articleRequest = null;
+        let wowInstance = null;
+        let lazyObserver = null;
 
         function getUrlParam(name) {
             const match = window.location.search.match(new RegExp('[\?&]' + name + '=([^&]+)'));
@@ -266,23 +268,35 @@
             });
             
             $list.empty().append(fragment);
+            
+            if (lazyObserver) {
+                lazyObserver.disconnect();
+                lazyObserver = null;
+            }
             initLazyLoad();
             
             $list.find('.wow').removeClass('animated');
             
             setTimeout(function() {
                 if (typeof WOW !== 'undefined') {
-                    const wow = new WOW({
-                        boxClass: 'wow',
-                        animateClass: 'animated',
-                        offset: 0,
-                        mobile: true,
-                        live: true,
-                        callback: function(box) {}
-                    });
-                    wow.init();
+                    if (!wowInstance) {
+                        wowInstance = new WOW({
+                            boxClass: 'wow',
+                            animateClass: 'animated',
+                            offset: 0,
+                            mobile: true,
+                            live: true,
+                            callback: function(box) {}
+                        });
+                        wowInstance.init();
+                    } else {
+                        $list.find('.wow').each(function() {
+                            this.style.visibility = 'visible';
+                            this.classList.add('animated');
+                        });
+                    }
                 }
-            }, 100);
+            }, 50);
         }
 
         function renderPagination() {
@@ -355,29 +369,33 @@
             const images = $list.find('img[data-src]');
             if (images.length === 0) return;
             
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        const src = img.getAttribute('data-src');
-                        if (src && !img.classList.contains('lazy-loaded')) {
-                            img.setAttribute('src', src);
-                            img.removeAttribute('data-src');
-                            img.classList.add('lazy-loaded');
+            if (!lazyObserver) {
+                lazyObserver = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.getAttribute('data-src');
+                            if (src && !img.classList.contains('lazy-loaded')) {
+                                img.setAttribute('src', src);
+                                img.removeAttribute('data-src');
+                                img.classList.add('lazy-loaded');
+                                lazyObserver.unobserve(img);
+                            }
                         }
-                    }
+                    });
+                }, {
+                    rootMargin: '100px',
+                    threshold: 0.1
                 });
-            }, {
-                rootMargin: '100px',
-                threshold: 0.1
-            });
+            }
             
             images.each(function() {
-                observer.observe(this);
+                lazyObserver.observe(this);
             });
         }
 
         $(document).ready(function() {
+            lazyObserver = null;
             loadTabs(function() {
                 loadArticles(currentPage, currentColumn ? currentColumn.columnId : currentColumnId);
             });
