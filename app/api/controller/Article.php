@@ -16,30 +16,64 @@ class Article extends ApiBase
             $size = min(50, max(1, intval($this->request->param('pageSize', 15))));
             $columnId = intval($this->request->param('columnId', 0));
 
+            $url_model = \xn_cfg("seo.url_model");
+
             $query = Db::name('article');
             if ($columnId > 0) {
                 $query->where('column_id', $columnId);
             }
 
             $total = $query->count();
-            $ids = $query->page($page, $size)
+            $articles = $query->page($page, $size)
                 ->order('id', 'desc')
-                ->column('id');
+                ->select();
 
             $result = [];
-            foreach ($ids as $id) {
-                $model = ArticleModel::find($id);
-                if ($model) {
-                    $result[] = [
-                        'id' => $model->id,
-                        'title' => $model->title ?? '',
-                        'description' => $model->description ?? '',
-                        'brief' => $model->brief_title ?? '',
-                        'img_url' => $model->img_url ?? '',
-                        'click' => $model->click ?? 0,
-                        'createTime' => $model->create_time ?? ''
-                    ];
+            foreach ($articles as $item) {
+                $img_url = '';
+                if (!empty($item['breviary_pic_id'])) {
+                    $img = \app\common\model\UploadFiles::field('url')->find($item['breviary_pic_id']);
+                    if ($img) {
+                        $img_url = $img["url"];
+                    }
                 }
+                if (empty($img_url)) {
+                    $img_url = "/static/images/noimage.gif";
+                }
+                
+                $column_name = '';
+                if (!empty($item['column_id'])) {
+                    $column = \app\common\model\Column::field('name')->find($item['column_id']);
+                    if ($column) {
+                        $column_name = $column['name'];
+                    }
+                }
+
+                if ($url_model == 1) {
+                    $link = '?s=/article/detail/id/' . $item['id'];
+                } else {
+                    $link = '/article/detail/' . $item['id'];
+                }
+
+                $result[] = [
+                    'id' => $item['id'],
+                    'column_id' => $item['column_id'],
+                    'column' => $column_name,
+                    'tags' => $item['tags'] ?? '',
+                    'title' => $item['title'] ?? '',
+                    'brief_title' => $item['brief_title'] ?? '',
+                    'img_url' => $img_url,
+                    'click' => $item['click'] ?? 0,
+                    'click_count' => $item['click'] ?? 0,
+                    'article_field' => $item['article_field'] ?? '',
+                    'content' => $item['content'] ?? '',
+                    'create_time' => $item['create_time'] ?? '',
+                    'release_time' => $item['release_time'] ?? $item['create_time'] ?? '',
+                    'keywords' => $item['keywords'] ?? '',
+                    'description' => $item['description'] ?? '',
+                    'lang' => $item['lang'] ?? '',
+                    'link' => $link
+                ];
             }
 
             return $this->success([

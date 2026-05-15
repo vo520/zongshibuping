@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="cn">
+    <head>
+        {include file="header"/}
+        <title>[$column.name]-{fox:basic name='title'/}</title>
+        <meta name="keywords" content="[$column.keywords]" />
+        <meta name="description" content="[$column.description]" />
+    </head>
+    <body>
+        <header class="foxui-border-bottom foxui-bg-white">{include file="nav"/}</header>
+        <main>
+            <div class="foxcms-common-banner foxui-bg-lighter">{include file="banner"/}</div>
+            <div class="foxcms-main list-article-main">
+                <div class="foxcms-container">
+                    <div class="about-us-tabs" id="aboutUsTabs">
+                        <div class="foxui-tabs-header">
+                            <!-- Tab items will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="foxui-row foxui-gutter-x-7 foxui-gutter-y-11" id="articleList">
+                        <div class="article-loading">
+                            <div class="foxui-loading"></div>
+                        </div>
+                    </div>
+                    <div class="foxcms-list-pagination" id="pagination">
+                    </div>
+                </div>
+            </div>
+            <div class="foxcms-fixed-container">{include file="fixed"/}</div>
+        </main>
+        <footer class="wow slideInUp">{include file="footer"/}</footer>
+    </body>
+    <script src="_STATIC_/skin/js/foxui-1.21.min.js"></script>
+    <script src="_STATIC_/skin/js/common.js"></script>
+    <script>
+    (function() {
+        const $list = $('#articleList');
+        const $pagination = $('#pagination');
+        const $tabs = $('#aboutUsTabs').find('.foxui-tabs-header');
+        const currentColumnId = parseInt('{$column.id}');
+        let currentPage = getUrlParam('page') || 1;
+        const pageSize = 6;
+        let totalPages = 1;
+        let loading = false;
+        let currentColumn = null;
+        let sections = [];
+
+        function getUrlParam(name) {
+            const match = window.location.search.match(new RegExp('[\?&]' + name + '=([^&]+)'));
+            return match ? parseInt(match[1]) : null;
+        }
+
+        function updateUrlParam(key, value) {
+            const url = new URL(window.location);
+            url.searchParams.set(key, value);
+            window.history.pushState({ path: url.href }, '', url.href);
+        }
+
+        function loadTabs() {
+            $.ajax({
+                url: '/api/column/list',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code === 1 && res.data && res.data.length > 0) {
+                        const columns = res.data;
+                        const parentColumnId = 2;
+                        const childSections = [];
+                        columns.forEach(function(col) {
+                            if (col.pid === parentColumnId && (col.status === 1 || col.status === undefined)) {
+                                childSections.push({
+                                    id: col.nid || 'section_' + col.id,
+                                    name: col.name,
+                                    type: col.column_model === 'single' ? 'single' : 'article',
+                                    columnId: col.id
+                                });
+                            }
+                        });
+                        childSections.sort(function(a, b) {
+                            return a.columnId - b.columnId;
+                        });
+                        if (childSections.length > 0) {
+                            sections = childSections;
+                            renderTabs(childSections);
+                        } else {
+                            sections = [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
+                            renderTabs(sections);
+                        }
+                    } else {
+                        sections = [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
+                        renderTabs(sections);
+                    }
+                },
+                error: function() {
+                    sections = [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
+                    renderTabs(sections);
+                }
+            });
+        }
+
+        function renderTabs(tabs) {
+            if (!tabs || tabs.length === 0) {
+                $tabs.hide();
+                currentColumn = { columnId: currentColumnId };
+                loadArticles(currentPage, currentColumnId);
+                return;
+            }
+            
+            let validTabs = [];
+            tabs.forEach(function(tab) {
+                if (!tab || !tab.name || !tab.columnId) return;
+                validTabs.push(tab);
+            });
+            
+            if (validTabs.length === 0) {
+                $tabs.hide();
+                currentColumn = { columnId: currentColumnId };
+                loadArticles(currentPage, currentColumnId);
+                return;
+            }
+            
+            if (validTabs.length === 1) {
+                $tabs.hide();
+                currentColumn = validTabs[0];
+                loadArticles(currentPage, validTabs[0].columnId);
+                return;
+            }
+            
+            $tabs.show();
+            let html = '';
+            const urlColumnId = getUrlParam('columnId');
+            let activeTab = validTabs.find(function(t) { return t.columnId === urlColumnId; }) || 
+                           validTabs.find(function(t) { return t.columnId === currentColumnId; }) || 
+                           validTabs[0];
+            
+            validTabs.forEach(function(tab) {
+                const isActive = tab.columnId === activeTab.columnId;
+                html += '<div class="foxui-tabs-item' + (isActive ? ' is-active' : '') + '" data-section="' + tab.id + '" data-type="' + tab.type + '" data-column-id="' + tab.columnId + '">' + tab.name + '</div>';
+            });
+            $tabs.html(html);
+            
+            currentColumn = activeTab;
+            updateUrlParam('columnId', activeTab.columnId);
+            loadArticles(currentPage, activeTab.columnId);
+            
+            $tabs.off('click', '.foxui-tabs-item');
+            $tabs.on('click', '.foxui-tabs-item', function() {
+                const $this = $(this);
+                const sectionId = $this.data('section');
+                if (sectionId === currentColumn.id) return;
+                
+                $tabs.find('.foxui-tabs-item').removeClass('is-active');
+                $this.addClass('is-active');
+                
+                currentColumn = {
+                    id: sectionId,
+                    type: $this.data('type'),
+                    columnId: $this.data('columnId')
+                };
+                currentPage = 1;
+                updateUrlParam('columnId', currentColumn.columnId);
+                updateUrlParam('page', 1);
+                loadArticles(currentPage, currentColumn.columnId);
+            });
+        }
+
+        function loadArticles(page, columnId) {
+            if (loading) return;
+            loading = true;
+            $list.html('<div class="article-loading"><div class="foxui-loading"></div></div>');
+            $pagination.hide();
+            
+            $.ajax({
+                url: '/api/article/list',
+                type: 'GET',
+                data: {
+                    columnId: columnId,
+                    page: page,
+                    pageSize: pageSize
+                },
+                dataType: 'json',
+                success: function(res) {
+                    loading = false;
+                    if (res && res.code === 1 && res.data) {
+                        const articles = res.data.list || [];
+                        const pagination = res.data.pagination || {};
+                        
+                        const total = pagination.total || articles.length;
+                        totalPages = pagination.totalPages || Math.ceil(total / pageSize);
+                        
+                        if (totalPages < 1) {
+                            totalPages = 1;
+                        }
+                        
+                        renderArticles(articles);
+                        renderPagination();
+                    } else {
+                        $list.html('<div class="article-empty">暂无文章</div>');
+                        $pagination.hide();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    loading = false;
+                    console.error('Article API Error:', error);
+                    $list.html('<div class="article-empty">加载失败，请刷新页面重试</div>');
+                    $pagination.hide();
+                }
+            });
+        }
+
+        function renderArticles(articles) {
+            if (!articles || articles.length === 0) {
+                $list.html('<div class="article-empty">暂无文章</div>');
+                return;
+            }
+            
+            let html = '';
+            articles.forEach(function(item, index) {
+                const imgUrl = item.img_url || '/static/images/noimage.gif';
+                const title = item.title || '';
+                const content = item.content || item.description || item.brief_title || '';
+                const columnName = item.column || '';
+                const releaseTime = item.release_time || item.create_time || '';
+                const clickCount = item.click_count || item.click || 0;
+                const link = item.link || '#';
+                
+                html += '<div class="foxui-col-md-8">';
+                html += '<a href="' + link + '" class="list-article-item wow slideInUp" style="visibility: hidden;animation-name: none;">';
+                html += '<div class="pic lazy-container" data-aspect-ratio="4/3">';
+                html += '<img class="lazy-image" data-src="' + imgUrl + '" alt="' + title + '" />';
+                html += '</div>';
+                html += '<div class="text">';
+                html += '<div class="info">';
+                html += '<div class="left">';
+                if (columnName) {
+                    html += '<span>' + columnName + '</span>';
+                }
+                if (releaseTime) {
+                    html += '<span>' + formatDate(releaseTime) + '</span>';
+                }
+                html += '</div>';
+                html += '<div class="right">';
+                html += '<i class="foxui-icon-xianshi-o"></i>';
+                html += '<span>' + clickCount + '</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '<h1 class="foxui-ellipsis-2">' + title + '</h1>';
+                html += '<p class="foxui-ellipsis-3">' + truncateText(content, 120) + '</p>';
+                html += '</div>';
+                html += '</a>';
+                html += '</div>';
+            });
+            $list.html(html);
+            initLazyLoad();
+            initWowAnimation();
+        }
+
+        function renderPagination() {
+            if (totalPages <= 1) {
+                $pagination.hide();
+                return;
+            }
+            
+            $pagination.show();
+            let html = '<div class="list-pagination-pc foxui-hidden-sm foxui-hidden-xs"><ul class="pagination">';
+            
+            html += '<li class="pagepre' + (currentPage <= 1 ? ' disabled' : '') + '"><a href="javascript:void(0)" data-page="' + (currentPage - 1) + '"><i class="foxui-icon-xiangzuo-o"></i></a></li>';
+            
+            const maxVisible = 5;
+            let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let end = Math.min(totalPages, start + maxVisible - 1);
+            
+            for (let i = start; i <= end; i++) {
+                html += '<li class="pageno' + (i === currentPage ? ' active' : '') + '"><a href="javascript:void(0)" data-page="' + i + '">' + i + '</a></li>';
+            }
+            
+            html += '<li class="pagenext' + (currentPage >= totalPages ? ' disabled' : '') + '"><a href="javascript:void(0)" data-page="' + (currentPage + 1) + '"><i class="foxui-icon-xiangyou-o"></i></a></li>';
+            html += '</ul></div>';
+            
+            html += '<div class="list-pagination-h5 foxui-visible-sm foxui-visible-xs">';
+            html += '<a href="javascript:void(0)" class="pagination-btn' + (currentPage <= 1 ? ' disabled' : '') + '" data-page="' + (currentPage - 1) + '">上一页</a>';
+            html += '<span>' + currentPage + '/' + totalPages + '</span>';
+            html += '<a href="javascript:void(0)" class="pagination-btn' + (currentPage >= totalPages ? ' disabled' : '') + '" data-page="' + (currentPage + 1) + '">下一页</a>';
+            html += '</div>';
+            
+            $pagination.html(html);
+            bindPaginationEvents();
+        }
+
+        function bindPaginationEvents() {
+            $pagination.off('click', 'a');
+            $pagination.on('click', 'a', function() {
+                const $link = $(this);
+                const $li = $link.parent('li');
+                if ($li.hasClass('disabled')) return;
+                const page = parseInt($link.data('page'));
+                if (page >= 1 && page <= totalPages && page !== currentPage) {
+                    currentPage = page;
+                    updateUrlParam('page', page);
+                    loadArticles(currentPage, currentColumn.columnId);
+                }
+            });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.getFullYear() + '-' + 
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(date.getDate()).padStart(2, '0');
+        }
+
+        function truncateText(text, length) {
+            const plainText = text.replace(/<[^>]*>/g, '');
+            return plainText.length > length ? plainText.substring(0, length) + '...' : plainText;
+        }
+
+        function initLazyLoad() {
+            $list.find('img[data-src]').each(function() {
+                const $img = $(this);
+                if (!$img.hasClass('lazy-loaded')) {
+                    const src = $img.attr('data-src');
+                    $img.attr('src', src).removeAttr('data-src').addClass('lazy-loaded');
+                }
+            });
+        }
+
+        function initWowAnimation() {
+            const $items = $list.find('.wow');
+            $items.each(function(index) {
+                const $item = $(this);
+                const delay = index * 0.15;
+                $item.css({
+                    'visibility': 'visible',
+                    'animation-name': 'slideInUp',
+                    'animation-duration': '0.5s',
+                    'animation-fill-mode': 'both',
+                    'animation-delay': delay + 's',
+                    'animation-timing-function': 'cubic-bezier(0.4, 0, 0.2, 1)'
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            loadTabs();
+        });
+    })();
+    </script>
+</html>
