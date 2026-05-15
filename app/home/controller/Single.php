@@ -39,7 +39,7 @@ class Single extends IndexBase
     public function index($id)
     {
         $single = \app\common\model\Single::where('column_id', $id)->find();
-        if ($single) {
+        if (!$single) {
             $single = [];
         }
         View::assign('single', $single);

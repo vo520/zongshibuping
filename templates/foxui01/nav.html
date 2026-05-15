@@ -14,6 +14,8 @@
                 </li>
                 {/fox:at}
                 {fox:nav name='field' currentstyle="is-current" limit="0,2"}
+                {fox:nav name="child" pname="field" notypeid="self" type="son" calltype="parent" row="1"}{/fox:nav}
+                {if $child}
                 <li class="foxui-menu-submenu [$field.currentstyle]">
                     <div class="foxui-menu-handle foxui-menu-icon">
                         <a class="foxui-link" href="[$field.link]">[$field.name]</a>
@@ -32,6 +34,11 @@
                         </div>
                     </div>
                 </li>
+                {else}
+                <li class="foxui-menu-item [$field.currentstyle]">
+                    <a class="foxui-link" href="[$field.link]">[$field.name]</a>
+                </li>
+                {/if}
                 {/fox:nav}
                 {fox:nav name='field' currentstyle='is-current' typeid="3,4"}
                 <li class="foxui-menu-submenu [$field.currentstyle]">

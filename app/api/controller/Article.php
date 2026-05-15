@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\api\controller;
 
 use think\facade\Db;
+use app\common\model\Article as ArticleModel;
 
 class Article extends ApiBase
 {
@@ -13,21 +14,32 @@ class Article extends ApiBase
         try {
             $page = max(1, intval($this->request->param('page', 1)));
             $size = min(50, max(1, intval($this->request->param('pageSize', 15))));
+            $columnId = intval($this->request->param('columnId', 0));
 
-            $total = Db::name('article')->count();
-            $list = Db::name('article')
-                ->page($page, $size)
+            $query = Db::name('article');
+            if ($columnId > 0) {
+                $query->where('column_id', $columnId);
+            }
+
+            $total = $query->count();
+            $ids = $query->page($page, $size)
                 ->order('id', 'desc')
-                ->select();
+                ->column('id');
 
             $result = [];
-            foreach ($list as $item) {
-                $result[] = [
-                    'id' => $item['id'],
-                    'title' => $item['title'] ?? '',
-                    'click' => $item['click'] ?? 0,
-                    'createTime' => $item['create_time'] ?? ''
-                ];
+            foreach ($ids as $id) {
+                $model = ArticleModel::find($id);
+                if ($model) {
+                    $result[] = [
+                        'id' => $model->id,
+                        'title' => $model->title ?? '',
+                        'description' => $model->description ?? '',
+                        'brief' => $model->brief_title ?? '',
+                        'img_url' => $model->img_url ?? '',
+                        'click' => $model->click ?? 0,
+                        'createTime' => $model->create_time ?? ''
+                    ];
+                }
             }
 
             return $this->success([

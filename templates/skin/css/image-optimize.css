@@ -1175,34 +1175,34 @@ body.lightbox-open { overflow: hidden; }
 
 .foxcms-grid-layout {
     display: grid;
-    grid-template-columns: repeat(var(--grid-columns, 4), 1fr);
-    gap: var(--grid-gap, 24px);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
 }
 
 @media (max-width: 1400px) {
     .foxcms-grid-layout {
-        --grid-columns: 3;
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 1200px) {
     .foxcms-grid-layout {
-        --grid-columns: 3;
-        --grid-gap: 20px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
     }
 }
 
 @media (max-width: 992px) {
     .foxcms-grid-layout {
-        --grid-columns: 2;
-        --grid-gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 }
 
 @media (max-width: 768px) {
     .foxcms-grid-layout {
-        --grid-columns: 1;
-        --grid-gap: 12px;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 12px;
     }
 }
 
@@ -1612,6 +1612,471 @@ body.lightbox-open { overflow: hidden; }
     .foxcms-customer-item {
         width: 70px;
         height: 70px;
+    }
+}
+
+.about-us-main {
+    padding: 60px 0;
+}
+
+.about-us-tabs {
+    margin-bottom: 40px;
+}
+
+.about-us-tabs .foxui-tabs-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0;
+}
+
+.about-us-tabs .foxui-tabs-item {
+    position: relative;
+    padding: 12px 24px;
+    color: #666;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border-radius: 8px 8px 0 0;
+}
+
+.about-us-tabs .foxui-tabs-item:hover {
+    color: #335df8;
+    background-color: #f5f7fa;
+}
+
+.about-us-tabs .foxui-tabs-item.is-active {
+    color: #335df8;
+    background-color: #fff;
+    border-bottom: 2px solid #335df8;
+    margin-bottom: -2px;
+}
+
+.about-us-content {
+    min-height: 400px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.about-us-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.about-us-error,
+.about-us-empty {
+    text-align: center;
+    color: #999;
+    padding: 80px 0;
+    font-size: 16px;
+}
+
+.about-us-empty .empty-icon {
+    margin-bottom: 20px;
+}
+
+.about-us-empty .empty-icon i {
+    font-size: 64px;
+    color: #ddd;
+}
+
+.about-us-empty p {
+    margin: 0;
+    font-size: 16px;
+    color: #999;
+}
+
+.about-us-error {
+    color: #e74c3c;
+}
+
+.about-us-body {
+    line-height: 1.8;
+}
+
+.about-us-body h1,
+.about-us-body h2,
+.about-us-body h3 {
+    color: #333;
+    margin: 24px 0 16px 0;
+    font-weight: bold;
+}
+
+.about-us-body h1 {
+    font-size: 28px;
+}
+
+.about-us-body h2 {
+    font-size: 22px;
+}
+
+.about-us-body h3 {
+    font-size: 18px;
+}
+
+.about-us-body p {
+    color: #666;
+    margin: 16px 0;
+    text-align: justify;
+}
+
+.about-us-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 16px 0;
+}
+
+@media (max-width: 992px) {
+    .about-us-main {
+        padding: 40px 0;
+    }
+    .about-us-tabs .foxui-tabs-item {
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+    .about-us-content {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-us-main {
+        padding: 32px 0;
+    }
+    .about-us-tabs .foxui-tabs-header {
+        gap: 4px;
+    }
+    .about-us-tabs .foxui-tabs-item {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+    .about-us-content {
+        padding: 16px;
+        border-radius: 8px;
+    }
+    .about-us-body h1 {
+        font-size: 22px;
+    }
+    .about-us-body h2 {
+        font-size: 18px;
+    }
+    .about-us-body h3 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-us-tabs .foxui-tabs-header {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    .about-us-tabs .foxui-tabs-item {
+        flex-shrink: 0;
+    }
+}
+
+.foxcms-honor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 20px 0;
+}
+
+.foxcms-honor-item {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.foxcms-honor-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(51, 93, 248, 0.15);
+}
+
+.foxcms-honor-pic {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    overflow: hidden;
+}
+
+.foxcms-honor-pic img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    transition: transform 0.4s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.foxcms-honor-pic img.lazy-loaded {
+    opacity: 1;
+}
+
+.foxcms-honor-item:hover .foxcms-honor-pic img {
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+.foxcms-honor-title {
+    padding: 20px;
+    text-align: center;
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
+    background: #fff;
+    transition: color 0.3s ease;
+}
+
+.foxcms-honor-item:hover .foxcms-honor-title {
+    color: #335df8;
+}
+
+.foxcms-team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.foxcms-team-item {
+    display: flex;
+    gap: 40px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.fadeInLeft {
+    animation-name: fadeInLeft;
+}
+
+.foxcms-team-item:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.foxcms-team-pic {
+    flex-shrink: 0;
+    width: 220px;
+    height: 165px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+}
+
+.foxcms-team-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.foxcms-team-item:hover .foxcms-team-pic img {
+    transform: scale(1.05);
+}
+
+.foxcms-team-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.foxcms-team-info h3 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 16px 0;
+    transition: color 0.3s ease;
+}
+
+.foxcms-team-item:hover .foxcms-team-info h3 {
+    color: #335df8;
+}
+
+.foxcms-team-info p {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.8;
+    margin: 0;
+}
+
+.no-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #ccc;
+    font-size: 48px;
+}
+
+.foxcms-article-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.foxcms-article-item {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.fadeInUp {
+    animation-name: fadeInUp;
+}
+
+.foxcms-article-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(51, 93, 248, 0.15);
+}
+
+.foxcms-article-pic {
+    position: relative;
+    width: 100%;
+    padding-top: 66%;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    overflow: hidden;
+}
+
+.foxcms-article-pic img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.foxcms-article-item:hover .foxcms-article-pic img {
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+.foxcms-article-info {
+    padding: 20px;
+}
+
+.foxcms-article-info h3 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 8px 0;
+    transition: color 0.3s ease;
+}
+
+.foxcms-article-item:hover .foxcms-article-info h3 {
+    color: #335df8;
+}
+
+.foxcms-article-info p {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.fadeIn {
+    animation: fadeInScale 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 1200px) {
+    .foxcms-honor-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .foxcms-article-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .foxcms-honor-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .foxcms-team-item {
+        flex-direction: column;
+        gap: 24px;
+    }
+    .foxcms-team-pic {
+        width: 100%;
+        height: 200px;
+    }
+    .foxcms-team-info h3 {
+        font-size: 20px;
+    }
+    .foxcms-article-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .foxcms-honor-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .foxcms-honor-title {
+        font-size: 13px;
+        padding: 12px;
+    }
+    .foxcms-team-item {
+        padding: 20px;
+    }
+    .foxcms-team-info h3 {
+        font-size: 18px;
+    }
+    .foxcms-article-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .foxcms-honor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .foxcms-honor-pic {
+        padding-top: 100%;
+    }
+    .foxcms-team-item {
+        padding: 16px;
     }
 }
 
