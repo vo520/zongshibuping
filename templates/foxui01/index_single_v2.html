@@ -49,13 +49,53 @@
         const currentColumnId = parseInt('{$column.id}');
 
         function loadTabs() {
-            const defaultSections = [
-                { id: 'about', name: '公司简介', type: 'single', columnId: 7 },
-                { id: 'honor', name: '荣誉资质', type: 'article', columnId: 8 },
-                { id: 'team', name: '核心团队', type: 'article', columnId: 9 },
-                { id: 'customer', name: '合作客户', type: 'article', columnId: 10 }
-            ];
-            renderTabs(defaultSections);
+            $.ajax({
+                url: '/api/column/list',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code === 1 && res.data && res.data.length > 0) {
+                        const columns = res.data;
+                        const parentColumnId = 1;
+                        const childSections = [];
+                        columns.forEach(function(col) {
+                            if (col.pid === parentColumnId && col.status === 1) {
+                                childSections.push({
+                                    id: col.nid || 'section_' + col.id,
+                                    name: col.name,
+                                    type: col.column_model === 'single' ? 'single' : 'article',
+                                    columnId: col.id
+                                });
+                            }
+                        });
+                        childSections.sort(function(a, b) {
+                            return a.columnId - b.columnId;
+                        });
+                        if (childSections.length > 0) {
+                            renderTabs(childSections);
+                        } else {
+                            renderTabs([
+                                { id: 'about', name: '公司简介', type: 'single', columnId: 7 }
+                            ]);
+                        }
+                    } else {
+                        renderTabs([
+                            { id: 'about', name: '公司简介', type: 'single', columnId: 7 },
+                            { id: 'honor', name: '荣誉资质', type: 'article', columnId: 8 },
+                            { id: 'team', name: '核心团队', type: 'article', columnId: 9 },
+                            { id: 'customer', name: '合作客户', type: 'article', columnId: 10 }
+                        ]);
+                    }
+                },
+                error: function() {
+                    renderTabs([
+                        { id: 'about', name: '公司简介', type: 'single', columnId: 7 },
+                        { id: 'honor', name: '荣誉资质', type: 'article', columnId: 8 },
+                        { id: 'team', name: '核心团队', type: 'article', columnId: 9 },
+                        { id: 'customer', name: '合作客户', type: 'article', columnId: 10 }
+                    ]);
+                }
+            });
         }
 
         function renderTabs(sections) {

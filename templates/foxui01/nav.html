@@ -13,33 +13,6 @@
                     <a class="foxui-link" href="/">首页</a>
                 </li>
                 {/fox:at}
-                {fox:nav name='field' currentstyle="is-current" limit="0,2"}
-                {fox:nav name="child" pname="field" notypeid="self" type="son" calltype="parent" row="1"}{/fox:nav}
-                {if $child}
-                <li class="foxui-menu-submenu [$field.currentstyle]">
-                    <div class="foxui-menu-handle foxui-menu-icon">
-                        <a class="foxui-link" href="[$field.link]">[$field.name]</a>
-                    </div>
-                    <div class="foxui-menu-menu">
-                        <div class="foxui-menu-slide foxcms-container">
-                            <div class="nav-swiper nav-swiper-text">
-                                <ul class="foxui-display-flex foxui-justify-content-center">
-                                    {fox:nav name="v" pname="field" notypeid="self" type="son" calltype="parent"}
-                                    <li>
-                                        <a href="[$v.link]" class="swiper-content foxui-link">[$v.name]</a>
-                                    </li>
-                                    {/fox:nav}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                {else}
-                <li class="foxui-menu-item [$field.currentstyle]">
-                    <a class="foxui-link" href="[$field.link]">[$field.name]</a>
-                </li>
-                {/if}
-                {/fox:nav}
                 {fox:nav name='field' currentstyle='is-current' typeid="3,4"}
                 <li class="foxui-menu-submenu [$field.currentstyle]">
                     <div class="foxui-menu-handle foxui-menu-icon">
@@ -83,6 +56,12 @@
                             </div>
                         </div>
                     </div>
+                </li>
+                {/fox:nav}
+                {fox:nav name='field' currentstyle="is-current" limit="0,2"}
+                {fox:nav name="child" pname="field" notypeid="self" type="son" calltype="parent" row="1"}{/fox:nav}
+                <li class="foxui-menu-item [$field.currentstyle]">
+                    <a class="foxui-link" href="[$field.link]">[$field.name]</a>
                 </li>
                 {/fox:nav}
                 {fox:nav name='field' currentstyle="is-current" typeid='6'}

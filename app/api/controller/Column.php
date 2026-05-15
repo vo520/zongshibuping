@@ -26,7 +26,10 @@ class Column extends ApiBase
                 $result[] = [
                     'id' => $item['id'],
                     'pid' => $item['pid'],
-                    'name' => $item['name'] ?? ''
+                    'name' => $item['name'] ?? '',
+                    'status' => $item['status'] ?? 1,
+                    'column_model' => $item['column_model'] ?? '',
+                    'nid' => $item['nid'] ?? ''
                 ];
             }
 
