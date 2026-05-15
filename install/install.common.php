@@ -2,7 +2,7 @@
 
 /**
  * 获取安装步骤
- * @Descripttion : PHP 多端跨平台内容管理系统
+ * 
  * @Author : Peter
  * @Date : 2022/6/27   8:26
  * @version : V1.08

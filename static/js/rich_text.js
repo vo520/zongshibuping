@@ -1,9 +1,9 @@
 /*
  * @Descripttion : 富文本插件
  * @Versions     : 0.1
- * @Author       : Team
+ * 
  * @Date         : 2022-01-11 19:54:00
- * @LastEditors  : QianFox Team
+ * 
  * @LastEditTime : 2024-02-29 16:26:54
  */
 

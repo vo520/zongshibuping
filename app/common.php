@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @Descripttion : PHP 多端跨平台内容管理系统
+ * 
  * @Author : Peter
  * @Date : 2023/6/26   16:55
  * @version : V1.08
@@ -936,6 +936,12 @@ if (!function_exists("get_column_up")) {
      */
     function get_column_up($columnId, $model = "", $lang = "")
     {
+        $cacheKey = "column_up_{$columnId}_{$model}_{$lang}";
+        $cached = cache($cacheKey);
+        if ($cached !== false) {
+            return $cached;
+        }
+        
         $condition = "1=1";
         if (!empty($model)) {
             $modelArr = explode(",", $model);
@@ -973,7 +979,9 @@ if (!function_exists("get_column_up")) {
                 ORDER BY
                     t1.lvl DESC
 php;
-        return Db::query($sql);
+        $result = Db::query($sql);
+        cache($cacheKey, $result, 3600);
+        return $result;
     }
 }
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @Descripttion : PHP 多端跨平台内容管理系统
+ * 
  * @Author : Peter
  * @Date : 2023/6/26   14:55
  * @version : V1.08

@@ -1,8 +1,8 @@
 /*
  * @Descripttion : 通用js
- * @Author       : liuzhifang
+
  * @Date         : 2022-06-02 13:42:45
- * @LastEditors  : Please set LastEditors
+ *
  * @LastEditTime : 2022-12-24 00:18:35
  */
 

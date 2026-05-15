@@ -1,11 +1,11 @@
 <?php
 /*
- * @Descripttion : QianFox让数字化营销更简单
- * @Author       : QianFox Team
+ * 
+ * 
  * @Date         : 2024-07-05 14:29:45
- * @Version      : V1.24
- * @Copyright    : @2026 
- * @LastEditors  : QianFox Team
+ * 
+ * 
+ * 
  * @LastEditTime : 2024-11-18 22:12:08
  */
 

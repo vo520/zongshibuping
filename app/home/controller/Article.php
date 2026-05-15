@@ -12,6 +12,8 @@ class Article extends IndexBase
 
     protected $view_suffix;//文件后缀
 
+    protected $article;//当前文章对象
+
     // 初始化
     protected function initialize()
     {
@@ -19,9 +21,9 @@ class Article extends IndexBase
         $id = $this->request->param("id");
         $action = $this->request->action();
         if($action == "detail"){
-            $article = \app\common\model\Article::find($id);
-            View::assign("article", $article);
-            $this->columnModel = Column::find($article['column_id']);//栏目模型
+            $this->article = \app\common\model\Article::find($id);
+            View::assign("article", $this->article);
+            $this->columnModel = Column::find($this->article['column_id']);//栏目模型
         }else{
             $this->columnModel = Column::find($id);//栏目模型
         }
@@ -51,17 +53,25 @@ class Article extends IndexBase
     }
 
 
-    public function  detail(){
-        $model_template = "view_article.{$this->view_suffix}";
+    public function detail(){
+        if (empty($this->request->param("id"))) {
+            return $this->error('参数错误');
+        }
+
+        if (empty($this->article)) {
+            return $this->error('文章不存在');
+        }
+
+        $model_template = "view_article_ajax.{$this->view_suffix}";
         if($this->columnModel){
             if(!empty($this->columnModel['model_template'])){
                 $model_template = $this->columnModel['model_template'];
             }
         }
-        if(($this->templateType == 2||$this->templateType == 3) && is_mobile()){//判断是否手机访问
+        if(($this->templateType == 2||$this->templateType == 3) && is_mobile()){
             $model_templateMobile = $this->mobileHtml($model_template, $this->view_suffix);
             $model_templateMobilePath =  $this->templateHtml . $model_templateMobile;
-            if(file_exists($model_templateMobilePath)){//判断文件是否存在
+            if(file_exists($model_templateMobilePath)){
                 $model_template = $model_templateMobile;
             }
         }

@@ -28,26 +28,37 @@ class Article extends ApiBase
                 ->order('id', 'desc')
                 ->select();
 
+            $imgIds = [];
+            $columnIds = [];
+            foreach ($articles as $item) {
+                if (!empty($item['breviary_pic_id'])) {
+                    $imgIds[] = $item['breviary_pic_id'];
+                }
+                if (!empty($item['column_id'])) {
+                    $columnIds[] = $item['column_id'];
+                }
+            }
+
+            $imgMap = [];
+            if (!empty($imgIds)) {
+                $imgs = \app\common\model\UploadFiles::field('id, url')->whereIn('id', $imgIds)->select();
+                foreach ($imgs as $img) {
+                    $imgMap[$img['id']] = $img['url'];
+                }
+            }
+
+            $columnMap = [];
+            if (!empty($columnIds)) {
+                $columns = \app\common\model\Column::field('id, name')->whereIn('id', $columnIds)->select();
+                foreach ($columns as $column) {
+                    $columnMap[$column['id']] = $column['name'];
+                }
+            }
+
             $result = [];
             foreach ($articles as $item) {
-                $img_url = '';
-                if (!empty($item['breviary_pic_id'])) {
-                    $img = \app\common\model\UploadFiles::field('url')->find($item['breviary_pic_id']);
-                    if ($img) {
-                        $img_url = $img["url"];
-                    }
-                }
-                if (empty($img_url)) {
-                    $img_url = "/static/images/noimage.gif";
-                }
-                
-                $column_name = '';
-                if (!empty($item['column_id'])) {
-                    $column = \app\common\model\Column::field('name')->find($item['column_id']);
-                    if ($column) {
-                        $column_name = $column['name'];
-                    }
-                }
+                $img_url = $imgMap[$item['breviary_pic_id']] ?? '/static/images/noimage.gif';
+                $column_name = $columnMap[$item['column_id']] ?? '';
 
                 if ($url_model == 1) {
                     $link = '?s=/article/detail/id/' . $item['id'];
@@ -64,7 +75,6 @@ class Article extends ApiBase
                     'brief_title' => $item['brief_title'] ?? '',
                     'img_url' => $img_url,
                     'click' => $item['click'] ?? 0,
-                    'click_count' => $item['click'] ?? 0,
                     'article_field' => $item['article_field'] ?? '',
                     'content' => $item['content'] ?? '',
                     'create_time' => $item['create_time'] ?? '',
@@ -124,12 +134,56 @@ class Article extends ApiBase
                 ->order('id', 'desc')
                 ->select();
 
+            $imgIds = [];
+            $columnIds = [];
+            foreach ($list as $item) {
+                if (!empty($item['breviary_pic_id'])) {
+                    $imgIds[] = $item['breviary_pic_id'];
+                }
+                if (!empty($item['column_id'])) {
+                    $columnIds[] = $item['column_id'];
+                }
+            }
+
+            $imgMap = [];
+            if (!empty($imgIds)) {
+                $imgs = \app\common\model\UploadFiles::field('id, url')->whereIn('id', $imgIds)->select();
+                foreach ($imgs as $img) {
+                    $imgMap[$img['id']] = $img['url'];
+                }
+            }
+
+            $columnMap = [];
+            if (!empty($columnIds)) {
+                $columns = \app\common\model\Column::field('id, name')->whereIn('id', $columnIds)->select();
+                foreach ($columns as $column) {
+                    $columnMap[$column['id']] = $column['name'];
+                }
+            }
+
+            $url_model = \xn_cfg("seo.url_model");
             $result = [];
             foreach ($list as $item) {
+                $img_url = $imgMap[$item['breviary_pic_id']] ?? '/static/images/noimage.gif';
+                $column_name = $columnMap[$item['column_id']] ?? '';
+
+                if ($url_model == 1) {
+                    $link = '?s=/article/detail/id/' . $item['id'];
+                } else {
+                    $link = '/article/detail/' . $item['id'];
+                }
+
                 $result[] = [
                     'id' => $item['id'],
+                    'column' => $column_name,
                     'title' => $item['title'] ?? '',
-                    'click' => $item['click'] ?? 0
+                    'content' => $item['content'] ?? '',
+                    'description' => $item['description'] ?? '',
+                    'img_url' => $img_url,
+                    'click' => $item['click'] ?? 0,
+                    'create_time' => $item['create_time'] ?? '',
+                    'release_time' => $item['release_time'] ?? $item['create_time'] ?? '',
+                    'link' => $link
                 ];
             }
 

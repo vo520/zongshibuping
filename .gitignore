@@ -1,3 +1,4 @@
+.DS_Store
 /vendor/
 /node_modules/
 /uploads/
@@ -6,7 +7,7 @@
 /install/install.lock
 /.env
 /.trae/
-.DS_Store
+html/
 *.log
 *.swp
 *.swo
@@ -19,5 +20,6 @@
 /reports/
 /tests/
 /config/view.php
-/sitemap.txt
-/sitemap.html
+sitemap.txt
+sitemap.xml
+sitemap.html

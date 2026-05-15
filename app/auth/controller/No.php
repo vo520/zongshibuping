@@ -2,7 +2,7 @@
 
 /**
  * 功能文件
- * @Descripttion : PHP 多端跨平台内容管理系统
+ * 
  * @Author : Peter
  * @Date : 2023/12/13   18:17
  * @version : V1.08

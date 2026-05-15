@@ -1,9 +1,9 @@
 /*
- * @Descripttion : 高效的PHP多端跨平台内容管理系统
- * @Author       : Team
+ * 
+ * 
  * @Date         : 2022-12-21 14:45:08
- * @version      : V1.08
- * @copyright    : @2026 
+ * 
+ * 
  * @LastEditTime : 2023-01-03 15:00:28
  */
 // let list = [

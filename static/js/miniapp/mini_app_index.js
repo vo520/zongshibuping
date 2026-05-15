@@ -1,9 +1,9 @@
 /*
- * @Descripttion : 高效的PHP多端跨平台内容管理系统
- * @Author       : Team
+ * 
+ * 
  * @Date         : 2022-12-23 00:41:39
- * @version      : V1.08
- * @copyright    : @2026 
+ * 
+ * 
  * @LastEditTime : 2022-12-24 11:30:22
  */
 
