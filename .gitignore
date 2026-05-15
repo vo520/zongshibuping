@@ -13,6 +13,8 @@
 *.bak
 /__pycache__/
 /.idea/
+/index.html
+/index/
 /.vscode/
 /reports/
 /tests/
