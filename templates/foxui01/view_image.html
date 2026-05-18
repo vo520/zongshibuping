@@ -14,7 +14,7 @@
             <!-- 内容 -->
             <div class="foxcms-main view-image-main">
                 <div class="foxcms-container">
-                    <ul class="foxui-breadcrumb icon-separator foxui-hidden-sm foxui-hidden-xs wow slideInUp">
+                    <ul class="foxui-breadcrumb icon-separator foxui-hidden-sm foxui-hidden-xs wow fadeIn">
                         {fox:positionshut name='field'}
                         <li class="foxui-breadcrumb-item">
                             <a href="[$field.link]">[$field.name]</a>
@@ -83,7 +83,7 @@
                 </div>
                 <div class="foxui-bg-white">
                     <div class="foxcms-container">
-                        <div class="article-head wow slideInUp">
+                        <div class="article-head wow fadeIn">
                             <h1>[$images.title]</h1>
                             <p class="foxui-hidden-sm foxui-hidden-xs foxui-margin-bottom-0">
                                 <span>日期：[$images.release_time|date='Y-m-d H:m']</span>
@@ -102,7 +102,7 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="article-content wow slideInUp">
+                        <div class="article-content wow fadeIn">
                             <div class="article-content-inner">
                                 <div class="rich-text">[$images.content]</div>
                                 <div class="share-list">
@@ -175,7 +175,7 @@
                                 {fox:images name='field' flag='c' }
                                 <div class="swiper-slide">
                                     <a href="[$field.link]">
-                                        <div class="list-case-item wow slideInUp">
+                                        <div class="list-case-item wow fadeIn">
                                             <div class="pic lazy-container" data-aspect-ratio="4/3">
                                                 <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                                                 {if $field.model == 'video'}

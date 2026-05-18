@@ -20,12 +20,12 @@
                     <div class="foxcms-container">
                         <div class="foxui-row foxui-gutter-0 foxui-align-items-center">
                             {fox:product name="field" row="6" flag="c" addfields="price"}
-                            <div class="recommend-item foxui-col-md-13 {if $index%2 != 0} foxui-push-md-11 {/if} wow slideInUp">
+                            <div class="recommend-item foxui-col-md-13 {if $index%2 != 0} foxui-push-md-11 {/if} wow fadeIn">
                                 <a href="[$field.link]" class="pic lazy-container" data-aspect-ratio="16/9">
                                     <img class="lazy-image" data-src="[$field.big_img]" alt="[$field.title]" />
                                 </a>
                             </div>
-                            <div class="recommend-item foxui-col-md-11 {if $index%2 != 0} foxui-pull-md-13 {/if} wow slideInUp">
+                            <div class="recommend-item foxui-col-md-11 {if $index%2 != 0} foxui-pull-md-13 {/if} wow fadeIn">
                                 <div class="text">
                                     <h1 class="foxui-ellipsis"><a href="[$field.link]">[$field.title]</a></h1>
                                     <p class="foxui-ellipsis-2">[$field.description]</p>
@@ -51,7 +51,7 @@
                         <div class="foxui-row foxui-gutter-7">
                             {fox:product name='field' addfields="price"}
                             <div class="foxui-col-md-8 foxui-col-xl-6">
-                                <a href="[$field.link]" class="list-product-item wow slideInUp" data-wow-delay="0.1s">
+                                <a href="[$field.link]" class="list-product-item wow fadeIn" data-wow-delay="0.1s">
                                     <div class="pic lazy-container" data-aspect-ratio="4/3">
                                         <img class="lazy-image" data-src="[$field.img_url]" alt="[$field.title]" />
                                     </div>

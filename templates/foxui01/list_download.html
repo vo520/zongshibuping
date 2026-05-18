@@ -19,7 +19,7 @@
                 <div class="foxcms-container list-download-pc foxui-bg-white foxui-hidden-xs foxui-hidden-sm">
                     <div class="list-download">
                         <ul class="download-collapse">
-                            <li class="foxui-display-flex foxui-border-bottom wow slideInUp">
+                            <li class="foxui-display-flex foxui-border-bottom wow fadeIn">
                                 <div class="th foxui-ellipsis">资料名称</div>
                                 <div class="th foxui-ellipsis">发布时间</div>
                                 <div class="th foxui-ellipsis">文件类别</div>
@@ -28,7 +28,7 @@
                                 <div class="th foxui-ellipsis"></div>
                             </li>
                             {fox:download name='field' row='10' channel="download"}
-                            <li class="download-collapse-item foxui-border-bottom wow slideInUp">
+                            <li class="download-collapse-item foxui-border-bottom wow fadeIn">
                                 <div class="download-collapse-head">
                                     <div class="td foxui-ellipsis">[$field.title]</div>
                                     <div class="td foxui-ellipsis">[$field.release_time|date='Y-m-d']</div>
@@ -84,7 +84,7 @@
                             </li>
                             {/fox:download}
                         </ul>
-                        <div class="load-more-container wow slideInUp">
+                        <div class="load-more-container wow fadeIn">
                             {fox:channel name='field' type="self"} {if $field.sum>10}
                             <button class="load-more-btn foxui-text-primary">
                                 <i class="foxui-icon-shuangxiangyou-o"></i>
@@ -98,7 +98,7 @@
                     <div class="list-download">
                         <ul class="foxui-collapse" data-fold="accordion">
                             {fox:download name='field' channel="download"}
-                            <li class="foxui-collapse-item wow slideInUp">
+                            <li class="foxui-collapse-item wow fadeIn">
                                 <div class="foxui-collapse-head foxui-collapse-handle">
                                     <span class="title foxui-ellipsis">[$field.title]</span>
                                     <span class="date">[$field.release_time|date='Y-m-d']</span>

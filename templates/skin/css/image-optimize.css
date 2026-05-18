@@ -1520,8 +1520,9 @@ body.lightbox-open { overflow: hidden; }
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 24px 20px;
-    padding: 20px 0;
+    align-items: center;
+    gap: 32px;
+    padding: 32px 0;
 }
 
 .foxcms-customer-item {
@@ -1565,7 +1566,8 @@ body.lightbox-open { overflow: hidden; }
 
 @media (max-width: 1400px) {
     .foxcms-customer-grid {
-        gap: 20px 16px;
+        gap: 28px;
+        padding: 28px 0;
     }
     .foxcms-customer-item {
         width: 110px;
@@ -1575,7 +1577,8 @@ body.lightbox-open { overflow: hidden; }
 
 @media (max-width: 1200px) {
     .foxcms-customer-grid {
-        gap: 18px 14px;
+        gap: 24px;
+        padding: 24px 0;
     }
     .foxcms-customer-item {
         width: 100px;
@@ -1585,7 +1588,8 @@ body.lightbox-open { overflow: hidden; }
 
 @media (max-width: 992px) {
     .foxcms-customer-grid {
-        gap: 16px 12px;
+        gap: 20px;
+        padding: 20px 0;
     }
     .foxcms-customer-item {
         width: 90px;
@@ -1596,7 +1600,8 @@ body.lightbox-open { overflow: hidden; }
 
 @media (max-width: 768px) {
     .foxcms-customer-grid {
-        gap: 14px 10px;
+        gap: 16px;
+        padding: 16px 0;
     }
     .foxcms-customer-item {
         width: 80px;
@@ -1607,7 +1612,8 @@ body.lightbox-open { overflow: hidden; }
 
 @media (max-width: 480px) {
     .foxcms-customer-grid {
-        gap: 12px 8px;
+        gap: 12px;
+        padding: 12px 0;
     }
     .foxcms-customer-item {
         width: 70px;
