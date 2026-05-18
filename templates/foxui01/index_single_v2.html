@@ -7,333 +7,299 @@
         <meta name="description" content="了解更多关于我们的信息" />
     </head>
     <body>
-        <!-- 顶部 -->
         <header class="foxui-border-bottom foxui-bg-white">{include file="nav"/}</header>
-        <!-- 主体内容 -->
         <main>
-            <!-- 通栏图 -->
             <div class="foxcms-common-banner foxui-bg-lighter">{include file="banner"/}</div>
-            <!-- 关于我们内容 -->
             <div class="foxcms-main about-us-main foxcms-responsive-padding">
                 <div class="foxcms-container">
-                    <!-- Tab 导航 -->
                     <div class="about-us-tabs" id="aboutUsTabs">
-                        <div class="foxui-tabs-header">
-                            <!-- Tab items will be loaded here -->
-                        </div>
+                        <div class="foxui-tabs-header"></div>
                     </div>
-                    <!-- 内容区域 -->
                     <div class="about-us-content" id="aboutUsContent">
                         <div class="about-us-loading">
                             <div class="foxui-loading"></div>
                         </div>
-                        <!-- Content will be loaded here -->
                     </div>
                 </div>
             </div>
-            <!-- 右侧浮动内容 -->
             <div class="foxcms-fixed-container">{include file="fixed"/}</div>
         </main>
-        <!-- 底部 -->
         <footer class="wow fadeIn">{include file="footer"/}</footer>
-    </body>
-    <script src="_STATIC_/skin/js/foxui-1.21.min.js"></script>
-    <script src="_STATIC_/skin/js/common.js"></script>
-    <script>
-    (function() {
-        const $tabs = $('#aboutUsTabs .foxui-tabs-header');
-        const $content = $('#aboutUsContent');
-        let currentTabId = null;
-        let currentSection = null;
-        let contentCache = {};
-        const currentColumnId = parseInt('{$column.id}');
+        <script src="_STATIC_/skin/js/foxui-1.21.min.js"></script>
+        <script src="_STATIC_/skin/js/common.js"></script>
+        <script>
+        (function() {
+            const CONFIG = {
+                API_COLUMN_LIST: '/api/column/list',
+                API_SINGLE: '/api/other/single',
+                API_ARTICLE_LIST: '/api/article/list',
+                DEFAULT_COLUMNS: [
+                    { id: 'about', name: '公司简介', type: 'single', columnId: 7 },
+                    { id: 'honor', name: '荣誉资质', type: 'article', columnId: 8 },
+                    { id: 'team', name: '核心团队', type: 'article', columnId: 9 },
+                    { id: 'customer', name: '合作客户', type: 'article', columnId: 10 }
+                ],
+                HONOR_COLUMN_ID: 8,
+                TEAM_COLUMN_ID: 9,
+                CUSTOMER_COLUMN_ID: 10,
+                ARTICLE_PAGE_SIZE: 50
+            };
 
-        function loadTabs() {
-            $.ajax({
-                url: '/api/column/list',
-                type: 'GET',
-                dataType: 'json',
-                success: function(res) {
+            const $tabs = $('#aboutUsTabs .foxui-tabs-header');
+            const $content = $('#aboutUsContent');
+            let currentTabId = null;
+            let contentCache = {};
+
+            const AboutUsModule = {
+                init() {
+                    this.loadTabs();
+                },
+
+                loadTabs() {
+                    $.ajax({
+                        url: CONFIG.API_COLUMN_LIST,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: this.handleTabLoadSuccess.bind(this),
+                        error: this.handleTabLoadError.bind(this)
+                    });
+                },
+
+                handleTabLoadSuccess(res) {
                     if (res.code === 1 && res.data && res.data.length > 0) {
-                        const columns = res.data;
-                        const parentColumnId = 1;
-                        const childSections = [];
-                        columns.forEach(function(col) {
-                            if (col.pid === parentColumnId && col.status === 1) {
-                                childSections.push({
-                                    id: col.nid || 'section_' + col.id,
-                                    name: col.name,
-                                    type: col.column_model === 'single' ? 'single' : 'article',
-                                    columnId: col.id
-                                });
-                            }
-                        });
-                        childSections.sort(function(a, b) {
-                            return a.columnId - b.columnId;
-                        });
-                        if (childSections.length > 0) {
-                            renderTabs(childSections);
-                        } else {
-                            renderTabs([
-                                { id: 'about', name: '公司简介', type: 'single', columnId: 7 }
-                            ]);
-                        }
+                        const childSections = res.data
+                            .filter(col => col.pid === 1 && col.status === 1)
+                            .map(col => ({
+                                id: col.nid || 'section_' + col.id,
+                                name: col.name,
+                                type: col.column_model === 'single' ? 'single' : 'article',
+                                columnId: col.id
+                            }))
+                            .sort((a, b) => a.columnId - b.columnId);
+                        
+                        this.renderTabs(childSections.length > 0 ? childSections : CONFIG.DEFAULT_COLUMNS);
                     } else {
-                        renderTabs([
-                            { id: 'about', name: '公司简介', type: 'single', columnId: 7 },
-                            { id: 'honor', name: '荣誉资质', type: 'article', columnId: 8 },
-                            { id: 'team', name: '核心团队', type: 'article', columnId: 9 },
-                            { id: 'customer', name: '合作客户', type: 'article', columnId: 10 }
-                        ]);
+                        this.renderTabs(CONFIG.DEFAULT_COLUMNS);
                     }
                 },
-                error: function() {
-                    renderTabs([
-                        { id: 'about', name: '公司简介', type: 'single', columnId: 7 },
-                        { id: 'honor', name: '荣誉资质', type: 'article', columnId: 8 },
-                        { id: 'team', name: '核心团队', type: 'article', columnId: 9 },
-                        { id: 'customer', name: '合作客户', type: 'article', columnId: 10 }
-                    ]);
-                }
-            });
-        }
 
-        function renderTabs(sections) {
-            if (!sections || sections.length === 0) {
-                $content.html('<div class="about-us-empty">暂无栏目信息</div>');
-                return;
-            }
-            let validTabs = [];
-            sections.forEach(function(section) {
-                if (!section || !section.name || !section.columnId) return;
-                validTabs.push(section);
-            });
-            if (validTabs.length === 0) {
-                $content.html('<div class="about-us-empty">暂无栏目信息</div>');
-                return;
-            }
-            let html = '';
-            validTabs.forEach(function(section, index) {
-                const isActive = index === 0 ? ' is-active' : '';
-                html += '<div class="foxui-tabs-item' + isActive + '" data-section="' + section.id + '" data-type="' + section.type + '" data-column-id="' + section.columnId + '">' + section.name + '</div>';
-            });
-            $tabs.html(html);
-            currentTabId = validTabs[0].id;
-            currentSection = validTabs[0];
-            loadContent(validTabs[0]);
-            bindTabEvents();
-        }
+                handleTabLoadError() {
+                    this.renderTabs(CONFIG.DEFAULT_COLUMNS);
+                },
 
-        function bindTabEvents() {
-            $tabs.on('click', '.foxui-tabs-item', function() {
-                const $this = $(this);
-                const sectionId = $this.data('section');
-                if (sectionId === currentTabId) return;
-                $tabs.find('.foxui-tabs-item').removeClass('is-active');
-                $this.addClass('is-active');
-                currentTabId = sectionId;
-                currentSection = {
-                    id: sectionId,
-                    type: $this.data('type'),
-                    columnId: $this.data('columnId')
-                };
-                loadContent(currentSection);
-            });
-        }
-
-        function loadContent(section) {
-            if (!section || !section.columnId) {
-                $content.html('<div class="about-us-empty">参数错误</div>');
-                return;
-            }
-            const cacheKey = section.id || section.columnId;
-            if (contentCache[cacheKey]) {
-                renderContent(cacheKey);
-                return;
-            }
-            $content.html('<div class="about-us-loading"><div class="foxui-loading"></div></div>');
-            
-            if (section.type === 'single') {
-                $.ajax({
-                    url: '/api/other/single',
-                    type: 'GET',
-                    data: { columnId: section.columnId },
-                    dataType: 'json',
-                    success: function(res) {
-                        if (res.code === 1 && res.data) {
-                            contentCache[cacheKey] = { type: 'single', data: res.data };
-                            renderContent(cacheKey);
-                        } else {
-                            contentCache[cacheKey] = { type: 'single', data: { content: '' } };
-                            renderContent(cacheKey);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Single API Error:', xhr);
-                        $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
+                renderTabs(sections) {
+                    if (!sections || sections.length === 0) {
+                        $content.html('<div class="about-us-empty">暂无栏目信息</div>');
+                        return;
                     }
-                });
-            } else if (section.type === 'article') {
-                $.ajax({
-                    url: '/api/article/list',
-                    type: 'GET',
-                    data: { columnId: section.columnId, pageSize: 50 },
-                    dataType: 'json',
-                    success: function(res) {
-                        if (res.code === 1 && res.data) {
-                            const list = res.data.list || res.data || [];
-                            contentCache[cacheKey] = { type: 'article', data: list, sectionId: section.id };
-                            renderContent(cacheKey);
-                        } else {
-                            contentCache[cacheKey] = { type: 'article', data: [], sectionId: section.id };
-                            renderContent(cacheKey);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Article API Error:', xhr);
-                        $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
+
+                    const validTabs = sections.filter(s => s && s.name && s.columnId);
+                    if (validTabs.length === 0) {
+                        $content.html('<div class="about-us-empty">暂无栏目信息</div>');
+                        return;
                     }
-                });
-            }
-        }
 
-        function renderContent(cacheKey) {
-            const cached = contentCache[cacheKey];
-            if (!cached) {
-                $content.html('<div class="about-us-empty">暂无内容</div>');
-                return;
-            }
-            let html = '';
-            if (cached.type === 'single') {
-                const content = cached.data.content || '';
-                if (!content || content.trim() === '') {
-                    html = '<div class="about-us-empty">暂无内容</div>';
-                } else {
-                    html = '<div class="about-us-body rich-text">' + content + '</div>';
-                }
-            } else if (cached.type === 'article') {
-                const articles = cached.data || [];
-                if (articles.length === 0) {
-                    html = '<div class="about-us-empty"><div class="empty-icon"><i class="foxui-icon-tupian1"></i></div><p>暂无内容</p></div>';
-                } else {
-                    html = renderArticleList(articles, cached.sectionId);
-                }
-            }
-            $content.html(html);
-            initLazyForNewContent();
-        }
+                    const html = validTabs.map((section, index) => 
+                        `<div class="foxui-tabs-item${index === 0 ? ' is-active' : ''}" 
+                            data-section="${section.id}" 
+                            data-type="${section.type}" 
+                            data-column-id="${section.columnId}">${section.name}</div>`
+                    ).join('');
 
-        function initLazyForNewContent() {
-            if (FoxModules && FoxModules.LazyLoad) {
-                $content.find('img[data-src]').each(function() {
-                    const img = this;
-                    const $img = $(img);
-                    if (!$img.hasClass('lazy-loaded') && !$img.hasClass('lazy-loading')) {
-                        const src = $img.attr('data-src');
-                        const srcset = $img.attr('data-srcset');
-                        if (src) {
-                            if (srcset) {
-                                $img.attr('srcset', srcset).removeAttr('data-srcset');
+                    $tabs.html(html);
+                    currentTabId = validTabs[0].id;
+                    this.loadContent(validTabs[0]);
+                    this.bindTabEvents();
+                },
+
+                bindTabEvents() {
+                    $tabs.on('click', '.foxui-tabs-item', (e) => {
+                        const $this = $(e.currentTarget);
+                        const sectionId = $this.data('section');
+                        
+                        if (sectionId === currentTabId) return;
+                        
+                        $tabs.find('.foxui-tabs-item').removeClass('is-active');
+                        $this.addClass('is-active');
+                        currentTabId = sectionId;
+                        
+                        this.loadContent({
+                            id: sectionId,
+                            type: $this.data('type'),
+                            columnId: $this.data('columnId')
+                        });
+                    });
+                },
+
+                loadContent(section) {
+                    if (!section || !section.columnId) {
+                        $content.html('<div class="about-us-empty">参数错误</div>');
+                        return;
+                    }
+
+                    const cacheKey = section.id || section.columnId;
+                    
+                    if (contentCache[cacheKey]) {
+                        this.renderContent(cacheKey);
+                        return;
+                    }
+
+                    $content.html('<div class="about-us-loading"><div class="foxui-loading"></div></div>');
+
+                    if (section.type === 'single') {
+                        this.loadSingleContent(section.columnId, cacheKey);
+                    } else {
+                        this.loadArticleList(section.columnId, cacheKey, section.id);
+                    }
+                },
+
+                loadSingleContent(columnId, cacheKey) {
+                    $.ajax({
+                        url: CONFIG.API_SINGLE,
+                        type: 'GET',
+                        data: { columnId },
+                        dataType: 'json',
+                        success: (res) => {
+                            contentCache[cacheKey] = { 
+                                type: 'single', 
+                                data: res.code === 1 && res.data ? res.data : { content: '' } 
+                            };
+                            this.renderContent(cacheKey);
+                        },
+                        error: () => {
+                            $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
+                        }
+                    });
+                },
+
+                loadArticleList(columnId, cacheKey, sectionId) {
+                    $.ajax({
+                        url: CONFIG.API_ARTICLE_LIST,
+                        type: 'GET',
+                        data: { columnId, pageSize: CONFIG.ARTICLE_PAGE_SIZE },
+                        dataType: 'json',
+                        success: (res) => {
+                            const list = res.code === 1 && res.data ? (res.data.list || res.data) : [];
+                            contentCache[cacheKey] = { type: 'article', data: list, sectionId };
+                            this.renderContent(cacheKey);
+                        },
+                        error: () => {
+                            $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
+                        }
+                    });
+                },
+
+                renderContent(cacheKey) {
+                    const cached = contentCache[cacheKey];
+                    if (!cached) {
+                        $content.html('<div class="about-us-empty">暂无内容</div>');
+                        return;
+                    }
+
+                    let html = '';
+                    if (cached.type === 'single') {
+                        const content = cached.data.content || '';
+                        html = content.trim() ? 
+                            `<div class="about-us-body rich-text">${content}</div>` : 
+                            '<div class="about-us-empty">暂无内容</div>';
+                    } else if (cached.type === 'article') {
+                        const articles = cached.data || [];
+                        html = articles.length > 0 ? 
+                            this.renderArticleList(articles, cached.sectionId) : 
+                            '<div class="about-us-empty"><div class="empty-icon"><i class="foxui-icon-tupian1"></i></div><p>暂无内容</p></div>';
+                    }
+
+                    $content.html(html);
+                    this.initLazyForNewContent();
+                },
+
+                initLazyForNewContent() {
+                    if (FoxModules && FoxModules.LazyLoad) {
+                        $content.find('img[data-src]').each(function() {
+                            const $img = $(this);
+                            if ($img.hasClass('lazy-loaded') || $img.hasClass('lazy-loading')) return;
+                            
+                            const src = $img.attr('data-src');
+                            if (src) {
+                                const srcset = $img.attr('data-srcset');
+                                if (srcset) $img.attr('srcset', srcset).removeAttr('data-srcset');
+                                $img.attr('src', src).removeAttr('data-src').addClass('lazy-loaded');
+                                
+                                const $container = $img.closest('.lazy-container');
+                                if ($container.length) $container.addClass('lazy-loaded');
                             }
-                            $img.attr('src', src).removeAttr('data-src').addClass('lazy-loaded');
-                            const $container = $img.closest('.lazy-container');
-                            if ($container.length) {
-                                $container.addClass('lazy-loaded');
-                            }
-                        }
+                        });
                     }
-                });
-            }
-        }
+                },
 
-        function renderArticleList(articles, sectionId) {
-            let html = '';
-            if (sectionId === 'honor') {
-                html = '<div class="foxcms-honor-grid">';
-                articles.forEach(function(item, index) {
-                    const imgUrl = item.img_url || '';
-                    const title = item.title || '';
-                    html += '<div class="foxcms-honor-item wow slideInUp" data-wow-delay="' + ((index % 4 * 0.1) + 0.1) + 's" data-wow-duration="0.6s">';
-                    html += '<div class="foxcms-honor-pic lazy-container' + (imgUrl ? '' : ' no-image') + '">';
-                    if (imgUrl) {
-                        html += '<img class="lazy-image" data-src="' + imgUrl + '" alt="' + title + '" />';
-                    } else {
-                        html += '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>';
-                    }
-                    html += '</div>';
-                    html += '<div class="foxcms-honor-title">' + title + '</div>';
-                    html += '</div>';
-                });
-                html += '</div>';
-            } else if (sectionId === 'team') {
-                html = '<div class="foxcms-team-list">';
-                articles.forEach(function(item, index) {
-                    const imgUrl = item.img_url || '';
-                    const title = item.title || '';
-                    const desc = item.description || item.brief || '';
-                    html += '<div class="foxcms-team-item wow slideInUp" data-wow-delay="' + (index * 0.15 + 0.1) + 's" data-wow-duration="0.6s">';
-                    html += '<div class="foxcms-team-pic lazy-container' + (imgUrl ? '' : ' no-image') + '" data-aspect-ratio="4/3">';
-                    if (imgUrl) {
-                        html += '<img class="lazy-image" data-src="' + imgUrl + '" alt="' + title + '" />';
-                    } else {
-                        html += '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>';
-                    }
-                    html += '</div>';
-                    html += '<div class="foxcms-team-info">';
-                    html += '<h3>' + title + '</h3>';
-                    if (desc) {
-                        html += '<p>' + desc + '</p>';
-                    }
-                    html += '</div>';
-                    html += '</div>';
-                });
-                html += '</div>';
-            } else if (sectionId === 'customer') {
-                html = '<div class="foxcms-customer-grid">';
-                articles.forEach(function(item, index) {
-                    const imgUrl = item.img_url || '';
-                    const title = item.title || '';
-                    html += '<div class="foxcms-customer-item wow slideInUp" data-wow-delay="' + ((index % 6 * 0.1) + 0.1) + 's" data-wow-duration="0.5s">';
-                    html += '<div class="foxcms-customer-pic lazy-container' + (imgUrl ? '' : ' no-image') + '">';
-                    if (imgUrl) {
-                        html += '<img class="lazy-image" data-src="' + imgUrl + '" alt="' + title + '" />';
-                    } else {
-                        html += '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>';
-                    }
-                    html += '</div>';
-                    html += '</div>';
-                });
-                html += '</div>';
-            } else {
-                html = '<div class="foxcms-article-grid">';
-                articles.forEach(function(item, index) {
-                    const imgUrl = item.img_url || '';
-                    const title = item.title || '';
-                    const desc = item.description || '';
-                    html += '<div class="foxcms-article-item wow slideInUp" data-wow-delay="' + ((index % 3 * 0.1) + 0.1) + 's" data-wow-duration="0.6s">';
-                    html += '<div class="foxcms-article-pic lazy-container' + (imgUrl ? '' : ' no-image') + '" data-aspect-ratio="16/9">';
-                    if (imgUrl) {
-                        html += '<img class="lazy-image" data-src="' + imgUrl + '" alt="' + title + '" />';
-                    } else {
-                        html += '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>';
-                    }
-                    html += '</div>';
-                    html += '<div class="foxcms-article-info">';
-                    html += '<h3>' + title + '</h3>';
-                    if (desc) {
-                        html += '<p>' + desc + '</p>';
-                    }
-                    html += '</div>';
-                    html += '</div>';
-                });
-                html += '</div>';
-            }
-            return html;
-        }
+                renderArticleList(articles, sectionId) {
+                    const match = sectionId ? sectionId.match(/(\d+)$/) : null;
+                    const columnId = match ? parseInt(match[1]) : 0;
 
-        $(document).ready(function() {
-            loadTabs();
-        });
-    })();
-    </script>
+                    const isHonor = columnId === CONFIG.HONOR_COLUMN_ID || sectionId === 'honor';
+                    const isTeam = columnId === CONFIG.TEAM_COLUMN_ID || sectionId === 'team';
+                    const isCustomer = columnId === CONFIG.CUSTOMER_COLUMN_ID || sectionId === 'customer';
+
+                    if (isHonor) return this.renderHonorGrid(articles);
+                    if (isTeam) return this.renderTeamList(articles);
+                    if (isCustomer) return this.renderCustomerGrid(articles);
+                    return this.renderArticleGrid(articles);
+                },
+
+                renderHonorGrid(articles) {
+                    return `<div class="foxcms-honor-grid">${articles.map((item, i) => `
+                        <div class="foxcms-honor-item wow fadeIn" data-wow-delay="${((i % 4 * 0.1) + 0.1)}s" data-wow-duration="0.6s">
+                            <div class="foxcms-honor-pic lazy-container${item.img_url ? '' : ' no-image'}">
+                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                            </div>
+                            <div class="foxcms-honor-title">${item.title || ''}</div>
+                        </div>
+                    `).join('')}</div>`;
+                },
+
+                renderTeamList(articles) {
+                    return `<div class="foxcms-team-list">${articles.map((item, i) => `
+                        <div class="foxcms-team-item wow fadeIn" data-wow-delay="${(i * 0.15 + 0.1)}s" data-wow-duration="0.6s">
+                            <div class="foxcms-team-pic lazy-container${item.img_url ? '' : ' no-image'}" data-aspect-ratio="4/3">
+                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                            </div>
+                            <div class="foxcms-team-info">
+                                <h3>${item.title || ''}</h3>
+                                ${(item.description || item.brief) ? `<p>${item.description || item.brief}</p>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}</div>`;
+                },
+
+                renderCustomerGrid(articles) {
+                    return `<div class="foxcms-customer-grid">${articles.map((item, i) => `
+                        <div class="foxcms-customer-item wow fadeIn" data-wow-delay="${((i % 6 * 0.1) + 0.1)}s" data-wow-duration="0.5s">
+                            <div class="foxcms-customer-pic lazy-container${item.img_url ? '' : ' no-image'}">
+                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                            </div>
+                        </div>
+                    `).join('')}</div>`;
+                },
+
+                renderArticleGrid(articles) {
+                    return `<div class="foxcms-article-grid">${articles.map((item, i) => `
+                        <div class="foxcms-article-item wow fadeInUp" data-wow-delay="${((i % 3 * 0.1) + 0.1)}s" data-wow-duration="0.6s">
+                            <div class="foxcms-article-pic lazy-container${item.img_url ? '' : ' no-image'}" data-aspect-ratio="16/9">
+                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                            </div>
+                            <div class="foxcms-article-info">
+                                <h3>${item.title || ''}</h3>
+                                ${item.description ? `<p>${item.description}</p>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}</div>`;
+                }
+            };
+
+            $(document).ready(() => {
+                AboutUsModule.init();
+            });
+        })();
+        </script>
+    </body>
 </html>
