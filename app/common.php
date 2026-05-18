@@ -936,52 +936,44 @@ if (!function_exists("get_column_up")) {
      */
     function get_column_up($columnId, $model = "", $lang = "")
     {
+        $columnId = intval($columnId);
+        if($columnId <= 0){
+            return [];
+        }
+        
         $cacheKey = "column_up_{$columnId}_{$model}_{$lang}";
         $cached = cache($cacheKey);
         if ($cached !== false) {
             return $cached;
         }
         
-        $condition = "1=1";
-        if (!empty($model)) {
-            $modelArr = explode(",", $model);
-            $modelsArr = [];
-            foreach ($modelArr as $k => $md) {
-                array_push($modelsArr, "'$md'");
+        $columns = [];
+        try{
+            $currentId = $columnId;
+            while($currentId > 0){
+                $column = Db::name('column')->where('id', $currentId);
+                if(!empty($lang)){
+                    $column->where('lang', $lang);
+                }
+                if(!empty($model)){
+                    $modelArr = explode(",", $model);
+                    $column->whereIn('column_model', $modelArr);
+                }
+                $columnData = $column->find();
+                
+                if(!$columnData){
+                    break;
+                }
+                
+                array_unshift($columns, $columnData);
+                $currentId = intval($columnData['pid']);
             }
-            if (sizeof($modelsArr) > 0) {
-                $models = implode(",", $modelsArr);
-                $condition = "t2.column_model in ({$models})";
-            }
+        }catch(\Exception $e){
+            $columns = [];
         }
-        if (!empty($lang)) {
-            $condition .= " and t2.lang='{$lang}'";
-        }
-        $sql = <<<php
-                SELECT
-                    t1.lvl as `level`,
-                    t2.*
-                FROM
-                    (
-                    SELECT
-                        @pid AS _id,
-                        ( SELECT @pid := pid FROM fox_column WHERE id = _id ) AS pid,
-                        @LEVEL := @LEVEL + 1 AS lvl
-                    FROM
-                        ( SELECT @pid := $columnId, @LEVEL := 0 ) vars,
-                        fox_column c
-                    WHERE
-                        @pid <> 0
-                    ) t1
-                    JOIN ( SELECT * FROM fox_column ) t2 ON t1._id = t2.id
-                where
-                   {$condition}
-                ORDER BY
-                    t1.lvl DESC
-php;
-        $result = Db::query($sql);
-        cache($cacheKey, $result, 3600);
-        return $result;
+        
+        cache($cacheKey, $columns, 3600);
+        return $columns;
     }
 }
 

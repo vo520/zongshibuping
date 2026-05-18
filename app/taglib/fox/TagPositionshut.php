@@ -51,6 +51,10 @@ class TagPositionshut extends TagBase
             }
             $typeid = (String)$id;
         }
+        
+        if(empty($typeid) || $typeid == "0"){
+            return [['name'=>$index_name, 'link'=>$link, 'lang'=>$visit_lang]];
+        }
 
         if(!empty($lang)){
             $visit_lang = $lang;
@@ -66,6 +70,16 @@ class TagPositionshut extends TagBase
         }
 
         $allColumn = get_column_up($typeid, $model, $visit_lang);
+        
+        if(empty($allColumn)){
+            $allColumn = [];
+            try{
+                $column = \app\common\model\Column::find($typeid);
+                if($column){
+                    array_push($allColumn, $column->toArray());
+                }
+            }catch(\Exception $e){}
+        }
         //生成路由 //1:动态url,2:伪静态化,3:静态页面
         $url_model = xn_cfg("seo.url_model");
         $url_html_suffix = config("route.url_html_suffix");
