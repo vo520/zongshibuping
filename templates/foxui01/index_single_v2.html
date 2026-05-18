@@ -42,49 +42,195 @@
                 HONOR_COLUMN_ID: 8,
                 TEAM_COLUMN_ID: 9,
                 CUSTOMER_COLUMN_ID: 10,
-                ARTICLE_PAGE_SIZE: 50
+                ARTICLE_PAGE_SIZE: 12,
+                LOAD_TIMEOUT: 8000
             };
 
             const $tabs = $('#aboutUsTabs .foxui-tabs-header');
             const $content = $('#aboutUsContent');
             let currentTabId = null;
             let contentCache = {};
+            let lazyObserver = null;
+            let activeRequests = {};
+
+            function getFullImageUrl(src) {
+                if (!src) return '';
+                if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) {
+                    return src;
+                }
+                if (!src.startsWith('/')) {
+                    return '/' + src;
+                }
+                return src;
+            }
+
+            function loadImage(img) {
+                const $img = $(img);
+                if ($img.hasClass('lazy-loaded') || $img.hasClass('lazy-loading')) return;
+                
+                const src = $img.attr('data-src');
+                if (!src) return;
+                
+                $img.addClass('lazy-loading');
+                
+                const fullSrc = getFullImageUrl(src);
+                const imgObj = new Image();
+                
+                imgObj.onload = function() {
+                    const srcset = $img.attr('data-srcset');
+                    if (srcset) $img.attr('srcset', srcset).removeAttr('data-srcset');
+                    $img.attr('src', fullSrc).removeAttr('data-src').addClass('lazy-loaded').removeClass('lazy-loading');
+                    $img.closest('.lazy-container').addClass('lazy-loaded');
+                    
+                    if (lazyObserver) {
+                        lazyObserver.unobserve(img);
+                    }
+                };
+                
+                imgObj.onerror = function() {
+                    $img.attr('src', '/static/images/noimage.gif').removeAttr('data-src').addClass('lazy-loaded').removeClass('lazy-loading');
+                    $img.closest('.lazy-container').addClass('lazy-loaded').addClass('no-image');
+                    
+                    if (lazyObserver) {
+                        lazyObserver.unobserve(img);
+                    }
+                };
+                
+                imgObj.src = fullSrc;
+            }
+
+            function createLazyObserver() {
+                if (lazyObserver || !window.IntersectionObserver) return;
+                
+                lazyObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            loadImage(entry.target);
+                        }
+                    });
+                }, {
+                    rootMargin: '200px',
+                    threshold: 0.01
+                });
+            }
+
+            function observeImages() {
+                createLazyObserver();
+                
+                $content.find('img[data-src]').each(function() {
+                    if (!this.classList.contains('lazy-loaded')) {
+                        if (lazyObserver) {
+                            lazyObserver.observe(this);
+                        } else {
+                            loadImage(this);
+                        }
+                    }
+                });
+            }
 
             const AboutUsModule = {
                 init() {
-                    this.loadTabs();
-                },
-
-                loadTabs() {
-                    $.ajax({
-                        url: CONFIG.API_COLUMN_LIST,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: this.handleTabLoadSuccess.bind(this),
-                        error: this.handleTabLoadError.bind(this)
+                    const defaultSection = CONFIG.DEFAULT_COLUMNS[0];
+                    Promise.all([
+                        this.loadTabsData(),
+                        this.loadSectionContent(defaultSection)
+                    ]).then(([sections, content]) => {
+                        this.renderTabs(sections);
+                        if (content) {
+                            contentCache[defaultSection.id] = content;
+                            this.renderContent(defaultSection.id);
+                        }
+                    }).catch(() => {
+                        this.renderTabs(CONFIG.DEFAULT_COLUMNS);
+                        $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
                     });
                 },
 
-                handleTabLoadSuccess(res) {
-                    if (res.code === 1 && res.data && res.data.length > 0) {
-                        const childSections = res.data
-                            .filter(col => col.pid === 1 && col.status === 1)
-                            .map(col => ({
-                                id: col.nid || 'section_' + col.id,
-                                name: col.name,
-                                type: col.column_model === 'single' ? 'single' : 'article',
-                                columnId: col.id
-                            }))
-                            .sort((a, b) => a.columnId - b.columnId);
-                        
-                        this.renderTabs(childSections.length > 0 ? childSections : CONFIG.DEFAULT_COLUMNS);
-                    } else {
-                        this.renderTabs(CONFIG.DEFAULT_COLUMNS);
-                    }
+                loadTabsData() {
+                    return new Promise((resolve) => {
+                        $.ajax({
+                            url: CONFIG.API_COLUMN_LIST,
+                            type: 'GET',
+                            dataType: 'json',
+                            timeout: CONFIG.LOAD_TIMEOUT,
+                            cache: true,
+                            data: { pid: 1 },
+                            success: (res) => {
+                                if (res && res.code === 1 && res.data && res.data.length > 0) {
+                                    const childSections = res.data
+                                        .filter(col => col.status === 1 || col.status === undefined)
+                                        .map(col => ({
+                                            id: col.nid || 'section_' + col.id,
+                                            name: col.name || '',
+                                            type: col.column_model === 'single' ? 'single' : 'article',
+                                            columnId: col.id
+                                        }))
+                                        .filter(s => s.name && s.columnId)
+                                        .sort((a, b) => a.columnId - b.columnId);
+                                    resolve(childSections.length > 0 ? childSections : CONFIG.DEFAULT_COLUMNS);
+                                } else {
+                                    resolve(CONFIG.DEFAULT_COLUMNS);
+                                }
+                            },
+                            error: () => {
+                                resolve(CONFIG.DEFAULT_COLUMNS);
+                            }
+                        });
+                    });
                 },
 
-                handleTabLoadError() {
-                    this.renderTabs(CONFIG.DEFAULT_COLUMNS);
+                loadSectionContent(section) {
+                    if (!section || !section.columnId) return Promise.resolve(null);
+                    
+                    const cacheKey = section.id || section.columnId;
+                    if (contentCache[cacheKey]) return Promise.resolve(contentCache[cacheKey]);
+
+                    return new Promise((resolve) => {
+                        if (activeRequests[cacheKey]) {
+                            activeRequests[cacheKey].abort();
+                        }
+
+                        let xhr;
+                        if (section.type === 'single') {
+                            xhr = $.ajax({
+                                url: CONFIG.API_SINGLE,
+                                type: 'GET',
+                                data: { columnId: section.columnId },
+                                dataType: 'json',
+                                timeout: CONFIG.LOAD_TIMEOUT,
+                                success: (res) => {
+                                    resolve({ 
+                                        type: 'single', 
+                                        data: res.code === 1 && res.data ? res.data : { content: '' },
+                                        sectionId: section.id
+                                    });
+                                },
+                                error: () => {
+                                    resolve(null);
+                                }
+                            });
+                        } else {
+                            xhr = $.ajax({
+                                url: CONFIG.API_ARTICLE_LIST,
+                                type: 'GET',
+                                data: { columnId: section.columnId, pageSize: CONFIG.ARTICLE_PAGE_SIZE },
+                                dataType: 'json',
+                                timeout: CONFIG.LOAD_TIMEOUT,
+                                success: (res) => {
+                                    const list = res.code === 1 && res.data ? (res.data.list || res.data) : [];
+                                    resolve({ type: 'article', data: list, sectionId: section.id });
+                                },
+                                error: () => {
+                                    resolve(null);
+                                }
+                            });
+                        }
+                        
+                        activeRequests[cacheKey] = xhr;
+                        xhr.always(() => {
+                            delete activeRequests[cacheKey];
+                        });
+                    });
                 },
 
                 renderTabs(sections) {
@@ -108,11 +254,10 @@
 
                     $tabs.html(html);
                     currentTabId = validTabs[0].id;
-                    this.loadContent(validTabs[0]);
-                    this.bindTabEvents();
+                    this.bindTabEvents(validTabs);
                 },
 
-                bindTabEvents() {
+                bindTabEvents(sections) {
                     $tabs.on('click', '.foxui-tabs-item', (e) => {
                         const $this = $(e.currentTarget);
                         const sectionId = $this.data('section');
@@ -123,15 +268,17 @@
                         $this.addClass('is-active');
                         currentTabId = sectionId;
                         
-                        this.loadContent({
+                        const section = sections.find(s => s.id === sectionId) || {
                             id: sectionId,
                             type: $this.data('type'),
                             columnId: $this.data('columnId')
-                        });
+                        };
+                        
+                        this.loadAndRenderContent(section);
                     });
                 },
 
-                loadContent(section) {
+                loadAndRenderContent(section) {
                     if (!section || !section.columnId) {
                         $content.html('<div class="about-us-empty">参数错误</div>');
                         return;
@@ -146,44 +293,11 @@
 
                     $content.html('<div class="about-us-loading"><div class="foxui-loading"></div></div>');
 
-                    if (section.type === 'single') {
-                        this.loadSingleContent(section.columnId, cacheKey);
-                    } else {
-                        this.loadArticleList(section.columnId, cacheKey, section.id);
-                    }
-                },
-
-                loadSingleContent(columnId, cacheKey) {
-                    $.ajax({
-                        url: CONFIG.API_SINGLE,
-                        type: 'GET',
-                        data: { columnId },
-                        dataType: 'json',
-                        success: (res) => {
-                            contentCache[cacheKey] = { 
-                                type: 'single', 
-                                data: res.code === 1 && res.data ? res.data : { content: '' } 
-                            };
+                    this.loadSectionContent(section).then((content) => {
+                        if (content) {
+                            contentCache[cacheKey] = content;
                             this.renderContent(cacheKey);
-                        },
-                        error: () => {
-                            $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
-                        }
-                    });
-                },
-
-                loadArticleList(columnId, cacheKey, sectionId) {
-                    $.ajax({
-                        url: CONFIG.API_ARTICLE_LIST,
-                        type: 'GET',
-                        data: { columnId, pageSize: CONFIG.ARTICLE_PAGE_SIZE },
-                        dataType: 'json',
-                        success: (res) => {
-                            const list = res.code === 1 && res.data ? (res.data.list || res.data) : [];
-                            contentCache[cacheKey] = { type: 'article', data: list, sectionId };
-                            this.renderContent(cacheKey);
-                        },
-                        error: () => {
+                        } else {
                             $content.html('<div class="about-us-error">加载失败，请刷新页面重试</div>');
                         }
                     });
@@ -210,26 +324,7 @@
                     }
 
                     $content.html(html);
-                    this.initLazyForNewContent();
-                },
-
-                initLazyForNewContent() {
-                    if (FoxModules && FoxModules.LazyLoad) {
-                        $content.find('img[data-src]').each(function() {
-                            const $img = $(this);
-                            if ($img.hasClass('lazy-loaded') || $img.hasClass('lazy-loading')) return;
-                            
-                            const src = $img.attr('data-src');
-                            if (src) {
-                                const srcset = $img.attr('data-srcset');
-                                if (srcset) $img.attr('srcset', srcset).removeAttr('data-srcset');
-                                $img.attr('src', src).removeAttr('data-src').addClass('lazy-loaded');
-                                
-                                const $container = $img.closest('.lazy-container');
-                                if ($container.length) $container.addClass('lazy-loaded');
-                            }
-                        });
-                    }
+                    observeImages();
                 },
 
                 renderArticleList(articles, sectionId) {
@@ -247,52 +342,76 @@
                 },
 
                 renderHonorGrid(articles) {
-                    return `<div class="foxcms-honor-grid">${articles.map((item, i) => `
-                        <div class="foxcms-honor-item wow fadeIn" data-wow-delay="${((i % 4 * 0.1) + 0.1)}s" data-wow-duration="0.6s">
-                            <div class="foxcms-honor-pic lazy-container${item.img_url ? '' : ' no-image'}">
-                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                    let html = '<div class="foxcms-honor-grid">';
+                    for (let i = 0; i < articles.length; i++) {
+                        const item = articles[i];
+                        const delay = ((i % 4 * 0.1) + 0.1).toFixed(1);
+                        html += `
+                            <div class="foxcms-honor-item" data-wow-delay="${delay}s" data-wow-duration="0.6s">
+                                <div class="foxcms-honor-pic lazy-container${item.img_url ? '' : ' no-image'}">
+                                    ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                                </div>
+                                <div class="foxcms-honor-title">${item.title || ''}</div>
                             </div>
-                            <div class="foxcms-honor-title">${item.title || ''}</div>
-                        </div>
-                    `).join('')}</div>`;
+                        `;
+                    }
+                    return html + '</div>';
                 },
 
                 renderTeamList(articles) {
-                    return `<div class="foxcms-team-list">${articles.map((item, i) => `
-                        <div class="foxcms-team-item wow fadeIn" data-wow-delay="${(i * 0.15 + 0.1)}s" data-wow-duration="0.6s">
-                            <div class="foxcms-team-pic lazy-container${item.img_url ? '' : ' no-image'}" data-aspect-ratio="4/3">
-                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                    let html = '<div class="foxcms-team-list">';
+                    for (let i = 0; i < articles.length; i++) {
+                        const item = articles[i];
+                        const delay = (i * 0.15 + 0.1).toFixed(2);
+                        html += `
+                            <div class="foxcms-team-item" data-wow-delay="${delay}s" data-wow-duration="0.6s">
+                                <div class="foxcms-team-pic lazy-container${item.img_url ? '' : ' no-image'}" data-aspect-ratio="4/3">
+                                    ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                                </div>
+                                <div class="foxcms-team-info">
+                                    <h3>${item.title || ''}</h3>
+                                    ${(item.description || item.brief) ? `<p>${item.description || item.brief}</p>` : ''}
+                                </div>
                             </div>
-                            <div class="foxcms-team-info">
-                                <h3>${item.title || ''}</h3>
-                                ${(item.description || item.brief) ? `<p>${item.description || item.brief}</p>` : ''}
-                            </div>
-                        </div>
-                    `).join('')}</div>`;
+                        `;
+                    }
+                    return html + '</div>';
                 },
 
                 renderCustomerGrid(articles) {
-                    return `<div class="foxcms-customer-grid">${articles.map((item, i) => `
-                        <div class="foxcms-customer-item wow fadeIn" data-wow-delay="${((i % 6 * 0.1) + 0.1)}s" data-wow-duration="0.5s">
-                            <div class="foxcms-customer-pic lazy-container${item.img_url ? '' : ' no-image'}">
-                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                    let html = '<div class="foxcms-customer-grid">';
+                    for (let i = 0; i < articles.length; i++) {
+                        const item = articles[i];
+                        const delay = ((i % 6 * 0.1) + 0.1).toFixed(1);
+                        html += `
+                            <div class="foxcms-customer-item" data-wow-delay="${delay}s" data-wow-duration="0.5s">
+                                <div class="foxcms-customer-pic lazy-container${item.img_url ? '' : ' no-image'}">
+                                    ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                                </div>
                             </div>
-                        </div>
-                    `).join('')}</div>`;
+                        `;
+                    }
+                    return html + '</div>';
                 },
 
                 renderArticleGrid(articles) {
-                    return `<div class="foxcms-article-grid">${articles.map((item, i) => `
-                        <div class="foxcms-article-item wow fadeInUp" data-wow-delay="${((i % 3 * 0.1) + 0.1)}s" data-wow-duration="0.6s">
-                            <div class="foxcms-article-pic lazy-container${item.img_url ? '' : ' no-image'}" data-aspect-ratio="16/9">
-                                ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                    let html = '<div class="foxcms-article-grid">';
+                    for (let i = 0; i < articles.length; i++) {
+                        const item = articles[i];
+                        const delay = ((i % 3 * 0.1) + 0.1).toFixed(1);
+                        html += `
+                            <div class="foxcms-article-item" data-wow-delay="${delay}s" data-wow-duration="0.6s">
+                                <div class="foxcms-article-pic lazy-container${item.img_url ? '' : ' no-image'}" data-aspect-ratio="16/9">
+                                    ${item.img_url ? `<img class="lazy-image" data-src="${item.img_url}" alt="${item.title || ''}" />` : '<div class="no-image-placeholder"><i class="foxui-icon-tupian1"></i></div>'}
+                                </div>
+                                <div class="foxcms-article-info">
+                                    <h3>${item.title || ''}</h3>
+                                    ${item.description ? `<p>${item.description}</p>` : ''}
+                                </div>
                             </div>
-                            <div class="foxcms-article-info">
-                                <h3>${item.title || ''}</h3>
-                                ${item.description ? `<p>${item.description}</p>` : ''}
-                            </div>
-                        </div>
-                    `).join('')}</div>`;
+                        `;
+                    }
+                    return html + '</div>';
                 }
             };
 

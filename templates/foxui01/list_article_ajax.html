@@ -47,9 +47,11 @@
         let articleRequest = null;
         let wowInstance = null;
         let lazyObserver = null;
+        let tabsLoaded = false;
+        let articlesLoaded = false;
 
         function getUrlParam(name) {
-            const match = window.location.search.match(new RegExp('[\?&]' + name + '=([^&]+)'));
+            const match = window.location.search.match(new RegExp('[\\?&]' + name + '=([^&]+)'));
             return match ? parseInt(match[1]) : null;
         }
 
@@ -59,43 +61,80 @@
             window.history.pushState({ path: url.href }, '', url.href);
         }
 
-        function loadTabs(callback) {
-            $.ajax({
-                url: '/api/column/list',
-                type: 'GET',
-                dataType: 'json',
-                cache: true,
-                success: function(res) {
-                    if (res.code === 1 && res.data && res.data.length > 0) {
-                        const columns = res.data;
-                        const parentColumnId = 2;
-                        const childSections = [];
-                        for (let i = 0; i < columns.length; i++) {
-                            const col = columns[i];
-                            if (col.pid === parentColumnId && (col.status === 1 || col.status === undefined)) {
-                                childSections.push({
-                                    id: col.nid || 'section_' + col.id,
-                                    name: col.name,
-                                    type: col.column_model === 'single' ? 'single' : 'article',
-                                    columnId: col.id
-                                });
+        function loadTabs() {
+            return new Promise(function(resolve) {
+                $.ajax({
+                    url: '/api/column/list',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: true,
+                    timeout: 5000,
+                    success: function(res) {
+                        if (res && res.code === 1 && res.data && res.data.length > 0) {
+                            const columns = res.data;
+                            const parentColumnId = 2;
+                            const childSections = [];
+                            for (let i = 0; i < columns.length; i++) {
+                                const col = columns[i];
+                                if (col.pid === parentColumnId && (col.status === 1 || col.status === undefined)) {
+                                    childSections.push({
+                                        id: col.nid || 'section_' + col.id,
+                                        name: col.name,
+                                        type: col.column_model === 'single' ? 'single' : 'article',
+                                        columnId: col.id
+                                    });
+                                }
                             }
+                            childSections.sort(function(a, b) {
+                                return a.columnId - b.columnId;
+                            });
+                            sections = childSections.length > 0 ? childSections : [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
+                        } else {
+                            sections = [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
                         }
-                        childSections.sort(function(a, b) {
-                            return a.columnId - b.columnId;
-                        });
-                        sections = childSections.length > 0 ? childSections : [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
-                    } else {
+                        resolve(sections);
+                    },
+                    error: function() {
                         sections = [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
+                        resolve(sections);
                     }
-                    renderTabs(sections);
-                    callback && callback();
-                },
-                error: function() {
-                    sections = [{ id: 'default', name: '{$column.name}', type: 'article', columnId: currentColumnId }];
-                    renderTabs(sections);
-                    callback && callback();
+                });
+            });
+        }
+
+        function loadArticlesData(page, columnId) {
+            return new Promise(function(resolve, reject) {
+                if (articleRequest) {
+                    articleRequest.abort();
                 }
+                
+                articleRequest = $.ajax({
+                    url: '/api/article/list',
+                    type: 'GET',
+                    data: {
+                        columnId: columnId,
+                        page: page,
+                        pageSize: pageSize
+                    },
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(res) {
+                        articleRequest = null;
+                        if (res && res.code === 1 && res.data) {
+                            resolve({
+                                list: res.data.list || [],
+                                pagination: res.data.pagination || {}
+                            });
+                        } else {
+                            resolve({ list: [], pagination: {} });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        if (status === 'abort') return;
+                        articleRequest = null;
+                        reject(error);
+                    }
+                });
             });
         }
 
@@ -103,7 +142,7 @@
             if (!tabs || tabs.length === 0) {
                 $tabs.hide();
                 currentColumn = { columnId: currentColumnId };
-                return;
+                return currentColumnId;
             }
             
             let validTabs = [];
@@ -117,13 +156,13 @@
             if (validTabs.length === 0) {
                 $tabs.hide();
                 currentColumn = { columnId: currentColumnId };
-                return;
+                return currentColumnId;
             }
             
             if (validTabs.length === 1) {
                 $tabs.hide();
                 currentColumn = validTabs[0];
-                return;
+                return validTabs[0].columnId;
             }
             
             $tabs.show();
@@ -142,7 +181,6 @@
             
             currentColumn = activeTab;
             updateUrlParam('columnId', activeTab.columnId);
-            loadArticles(currentPage, activeTab.columnId);
             
             $tabs.off('click', '.foxui-tabs-item');
             $tabs.on('click', '.foxui-tabs-item', function() {
@@ -161,60 +199,38 @@
                 currentPage = 1;
                 updateUrlParam('columnId', currentColumn.columnId);
                 updateUrlParam('page', 1);
-                loadArticles(currentPage, currentColumn.columnId);
+                loadAndRenderArticles(currentPage, currentColumn.columnId);
             });
+            
+            return activeTab.columnId;
         }
 
-        function loadArticles(page, columnId) {
+        function loadAndRenderArticles(page, columnId) {
             if (loading) return;
             loading = true;
-            
-            if (articleRequest) {
-                articleRequest.abort();
-            }
             
             $list.html('<div class="article-loading"><div class="foxui-loading"></div></div>');
             $pagination.hide();
             
-            articleRequest = $.ajax({
-                url: '/api/article/list',
-                type: 'GET',
-                data: {
-                    columnId: columnId,
-                    page: page,
-                    pageSize: pageSize
-                },
-                dataType: 'json',
-                timeout: 10000,
-                success: function(res) {
-                    loading = false;
-                    articleRequest = null;
-                    if (res && res.code === 1 && res.data) {
-                        const articles = res.data.list || [];
-                        const pagination = res.data.pagination || {};
-                        
-                        const total = pagination.total || articles.length;
-                        totalPages = pagination.totalPages || Math.ceil(total / pageSize);
-                        
-                        if (totalPages < 1) {
-                            totalPages = 1;
-                        }
-                        
-                        renderArticles(articles);
-                        renderPagination();
-                    } else {
-                        $list.html('<div class="article-empty">暂无文章</div>');
-                        $pagination.hide();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    if (status === 'abort') return;
-                    loading = false;
-                    articleRequest = null;
-                    console.error('Article API Error:', error);
-                    $list.html('<div class="article-empty">加载失败，请刷新页面重试</div>');
-                    $pagination.hide();
+            loadArticlesData(page, columnId).then(function(result) {
+                loading = false;
+                const articles = result.list || [];
+                const pagination = result.pagination || {};
+                
+                const total = pagination.total || articles.length;
+                totalPages = pagination.totalPages || Math.ceil(total / pageSize);
+                
+                if (totalPages < 1) {
+                    totalPages = 1;
                 }
+                
+                renderArticles(articles);
+                renderPagination();
+            }).catch(function(error) {
+                loading = false;
+                console.error('Article API Error:', error);
+                $list.html('<div class="article-empty">加载失败，请刷新页面重试</div>');
+                $pagination.hide();
             });
         }
 
@@ -224,9 +240,9 @@
                 return;
             }
             
-            const fragment = document.createDocumentFragment();
-            
-            articles.forEach(function(item, index) {
+            let html = '';
+            for (let i = 0; i < articles.length; i++) {
+                const item = articles[i];
                 const imgUrl = item.img_url || '/static/images/noimage.gif';
                 const title = item.title || '';
                 const content = item.content || item.description || item.brief_title || '';
@@ -235,68 +251,54 @@
                 const clickCount = item.click_count || item.click || 0;
                 const link = item.link || '#';
                 
-                const colDiv = document.createElement('div');
-                colDiv.className = 'foxui-col-md-8';
-                
-                const a = document.createElement('a');
-                a.href = link;
-                a.className = 'list-article-item wow zoomIn';
-                a.setAttribute('data-wow-delay', (index * 0.1) + 's');
-                
-                a.innerHTML = `
-                    <div class="pic lazy-container" data-aspect-ratio="4/3">
-                        <img class="lazy-image" data-src="${imgUrl}" alt="${title}" />
-                    </div>
-                    <div class="text">
-                        <div class="info">
-                            <div class="left">
-                                ${columnName ? '<span>' + columnName + '</span>' : ''}
-                                ${releaseTime ? '<span>' + formatDate(releaseTime) + '</span>' : ''}
+                html += `
+                    <div class="foxui-col-md-8">
+                        <a href="${link}" class="list-article-item" data-wow-delay="${(i * 0.1).toFixed(1)}s">
+                            <div class="pic lazy-container" data-aspect-ratio="4/3">
+                                <img class="lazy-image" data-src="${imgUrl}" alt="${title}" />
                             </div>
-                            <div class="right">
-                                <i class="foxui-icon-xianshi-o"></i>
-                                <span>${clickCount}</span>
+                            <div class="text">
+                                <div class="info">
+                                    <div class="left">
+                                        ${columnName ? '<span>' + columnName + '</span>' : ''}
+                                        ${releaseTime ? '<span>' + formatDate(releaseTime) + '</span>' : ''}
+                                    </div>
+                                    <div class="right">
+                                        <i class="foxui-icon-xianshi-o"></i>
+                                        <span>${clickCount}</span>
+                                    </div>
+                                </div>
+                                <h1 class="foxui-ellipsis-2">${title}</h1>
+                                <p class="foxui-ellipsis-3">${truncateText(content, 120)}</p>
                             </div>
-                        </div>
-                        <h1 class="foxui-ellipsis-2">${title}</h1>
-                        <p class="foxui-ellipsis-3">${truncateText(content, 120)}</p>
+                        </a>
                     </div>
                 `;
-                
-                colDiv.appendChild(a);
-                fragment.appendChild(colDiv);
-            });
-            
-            $list.empty().append(fragment);
-            
-            if (lazyObserver) {
-                lazyObserver.disconnect();
-                lazyObserver = null;
             }
+            
+            $list.html(html);
             initLazyLoad();
+            initAnimations();
+        }
+
+        function initAnimations() {
+            if (typeof WOW === 'undefined') return;
             
-            $list.find('.wow').removeClass('animated');
-            
-            setTimeout(function() {
-                if (typeof WOW !== 'undefined') {
-                    if (!wowInstance) {
-                        wowInstance = new WOW({
-                            boxClass: 'wow',
-                            animateClass: 'animated',
-                            offset: 0,
-                            mobile: true,
-                            live: true,
-                            callback: function(box) {}
-                        });
-                        wowInstance.init();
-                    } else {
-                        $list.find('.wow').each(function() {
-                            this.style.visibility = 'visible';
-                            this.classList.add('animated');
-                        });
-                    }
-                }
-            }, 50);
+            if (!wowInstance) {
+                wowInstance = new WOW({
+                    boxClass: 'wow',
+                    animateClass: 'animated',
+                    offset: 50,
+                    mobile: true,
+                    live: true
+                });
+                wowInstance.init();
+            } else {
+                $list.find('.list-article-item').addClass('wow zoomIn');
+                setTimeout(function() {
+                    wowInstance.sync();
+                }, 100);
+            }
         }
 
         function renderPagination() {
@@ -347,7 +349,7 @@
                 if (page >= 1 && page <= totalPages && page !== currentPage) {
                     currentPage = page;
                     updateUrlParam('page', page);
-                    loadArticles(currentPage, currentColumn.columnId);
+                    loadAndRenderArticles(currentPage, currentColumn.columnId);
                 }
             });
         }
@@ -361,13 +363,19 @@
         }
 
         function truncateText(text, length) {
+            if (!text) return '';
             const plainText = text.replace(/<[^>]*>/g, '');
             return plainText.length > length ? plainText.substring(0, length) + '...' : plainText;
         }
 
         function initLazyLoad() {
-            const images = $list.find('img[data-src]');
-            if (images.length === 0) return;
+            if (!window.IntersectionObserver) {
+                $list.find('img[data-src]').each(function() {
+                    const img = $(this);
+                    img.attr('src', img.data('src')).removeAttr('data-src').addClass('lazy-loaded');
+                });
+                return;
+            }
             
             if (!lazyObserver) {
                 lazyObserver = new IntersectionObserver(function(entries) {
@@ -384,20 +392,46 @@
                         }
                     });
                 }, {
-                    rootMargin: '100px',
-                    threshold: 0.1
+                    rootMargin: '150px',
+                    threshold: 0.01
                 });
             }
             
-            images.each(function() {
+            $list.find('img[data-src]').each(function() {
                 lazyObserver.observe(this);
             });
         }
 
         $(document).ready(function() {
-            lazyObserver = null;
-            loadTabs(function() {
-                loadArticles(currentPage, currentColumn ? currentColumn.columnId : currentColumnId);
+            const urlColumnId = getUrlParam('columnId');
+            const targetColumnId = urlColumnId || currentColumnId;
+            
+            Promise.all([
+                loadTabs(),
+                loadArticlesData(currentPage, targetColumnId)
+            ]).then(function(results) {
+                const tabs = results[0];
+                const articleResult = results[1];
+                
+                const activeColumnId = renderTabs(tabs);
+                currentColumn = currentColumn || { columnId: activeColumnId };
+                
+                const articles = articleResult.list || [];
+                const pagination = articleResult.pagination || {};
+                
+                const total = pagination.total || articles.length;
+                totalPages = pagination.totalPages || Math.ceil(total / pageSize);
+                
+                if (totalPages < 1) {
+                    totalPages = 1;
+                }
+                
+                renderArticles(articles);
+                renderPagination();
+            }).catch(function(error) {
+                console.error('Initial load error:', error);
+                currentColumn = { columnId: currentColumnId };
+                $list.html('<div class="article-empty">加载失败，请刷新页面重试</div>');
             });
         });
     })();
